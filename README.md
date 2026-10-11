@@ -392,6 +392,7 @@ npm run lint    # turbo run lint
 https://youtube.com/shorts/aXNzBXW7eJY?feature=share
 
 
-
+### Demo video of the Watch  
+https://youtu.be/zQ51H6ht0Bo?si=HhqQssPlog7aTL-F
 
 
