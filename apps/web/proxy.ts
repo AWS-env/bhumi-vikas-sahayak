@@ -3,10 +3,27 @@ import { NextResponse, type NextRequest } from "next/server";
 
 export async function proxy(request: NextRequest) {
   let response = NextResponse.next({ request });
+  const { pathname } = request.nextUrl;
+  const isApi = pathname === "/api" || pathname.startsWith("/api/");
+  const isProtected = isApi || pathname === "/chat" || pathname.startsWith("/chat/");
+
+  // Public pages, including the landing page, do not need an auth client.
+  if (!isProtected && pathname !== "/login") {
+    return response;
+  }
+
+  const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
+  const supabaseKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
+  if (!supabaseUrl || !supabaseKey) {
+    return NextResponse.json(
+      { error: "Authentication is not configured. Set the Supabase URL and public key in apps/web/.env.local and restart the server." },
+      { status: 503 },
+    );
+  }
 
   const supabase = createServerClient(
-    process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
+    supabaseUrl,
+    supabaseKey,
     {
       cookies: {
         getAll: () => request.cookies.getAll(),
@@ -27,10 +44,6 @@ export async function proxy(request: NextRequest) {
   const {
     data: { user },
   } = await supabase.auth.getUser();
-
-  const { pathname } = request.nextUrl;
-  const isApi = pathname.startsWith("/api/");
-  const isProtected = isApi || pathname === "/chat" || pathname.startsWith("/chat/");
 
   if (!user && isProtected) {
     if (isApi) {
