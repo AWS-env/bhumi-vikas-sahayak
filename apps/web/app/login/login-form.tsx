@@ -1,7 +1,9 @@
 "use client";
 
-import { useActionState, useState } from "react";
+import { useActionState, useLayoutEffect, useRef, useState } from "react";
+import gsap from "gsap";
 import { demoLogin, signIn, signUp, type AuthState } from "./actions";
+
 
 type Lang = "en" | "hi";
 type Mode = "signin" | "signup";
@@ -14,6 +16,8 @@ const t = {
     password: "Password",
     signin: "Sign in",
     signup: "Create account",
+    signingIn: "Signing in…",
+    creating: "Creating account…",
     toSignup: "New here? Create an account",
     toSignin: "Already have an account? Sign in",
     hint: "At least 8 characters",
@@ -36,6 +40,8 @@ const t = {
     password: "पासवर्ड",
     signin: "साइन इन करें",
     signup: "खाता बनाएँ",
+    signingIn: "साइन इन हो रहा है…",
+    creating: "खाता बन रहा है…",
     toSignup: "नए हैं? खाता बनाएँ",
     toSignin: "पहले से खाता है? साइन इन करें",
     hint: "कम से कम 8 अक्षर",
@@ -54,8 +60,18 @@ const t = {
 } as const;
 
 export default function LoginForm() {
+  const card = useRef<HTMLElement>(null);
+  const formPanel = useRef<HTMLDivElement>(null);
+  const artPanel = useRef<HTMLDivElement>(null);
+  const artImage = useRef<HTMLDivElement>(null);
+  const formContent = useRef<HTMLDivElement>(null);
+  const modeSwitch = useRef<HTMLButtonElement>(null);
+  const animationContext = useRef<gsap.Context | null>(null);
+  const panelSwap = useRef<gsap.core.Timeline | null>(null);
+  const currentMode = useRef<Mode>("signin");
   const [lang, setLang] = useState<Lang>("en");
   const [mode, setMode] = useState<Mode>("signin");
+  const [switching, setSwitching] = useState(false);
   const [state, action, pending] = useActionState<AuthState, FormData>(
     mode === "signin" ? signIn : signUp,
     null,
@@ -68,21 +84,103 @@ export default function LoginForm() {
   const error = state?.error ?? demoState?.error;
   const errorText = error ? s.errors[error as keyof typeof s.errors] : null;
 
+  useLayoutEffect(() => {
+    const motion = gsap.matchMedia();
+    motion.add("(prefers-reduced-motion: no-preference)", () => {
+      gsap.from(card.current, {
+        opacity: 0,
+        y: 10,
+        duration: 0.8,
+        ease: "sine.out",
+        clearProps: "opacity,transform",
+      });
+    }, card);
+    return () => motion.revert();
+  }, []);
+
+  useLayoutEffect(() => {
+    const context = gsap.context(() => {}, card);
+    animationContext.current = context;
+    const desktop = window.matchMedia("(min-width: 761px)");
+    const reduced = window.matchMedia("(prefers-reduced-motion: reduce)");
+    const alignPanels = () => context.add(() => {
+      // Finish a running switch before a breakpoint or motion preference changes.
+      panelSwap.current?.progress(1);
+      const swapped = desktop.matches && currentMode.current === "signup";
+      gsap.set(formPanel.current, { xPercent: swapped ? (52.75 / 47.25) * 100 : 0 });
+      gsap.set(artPanel.current, { xPercent: swapped ? -(47.25 / 52.75) * 100 : 0 });
+    });
+    desktop.addEventListener("change", alignPanels);
+    reduced.addEventListener("change", alignPanels);
+    return () => {
+      desktop.removeEventListener("change", alignPanels);
+      reduced.removeEventListener("change", alignPanels);
+      context.revert();
+      animationContext.current = null;
+      panelSwap.current = null;
+    };
+  }, []);
+
+  function switchMode() {
+    if (pending || demoPending || switching || !animationContext.current) return;
+    const nextMode = mode === "signin" ? "signup" : "signin";
+    currentMode.current = nextMode;
+    const desktop = window.matchMedia("(min-width: 761px)").matches;
+    const swapped = desktop && nextMode === "signup";
+    const formX = swapped ? (52.75 / 47.25) * 100 : 0;
+    const artX = swapped ? -(47.25 / 52.75) * 100 : 0;
+
+    animationContext.current.add(() => {
+      panelSwap.current?.kill();
+      if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
+        gsap.set(formPanel.current, { xPercent: formX });
+        gsap.set(artPanel.current, { xPercent: artX });
+        setMode(nextMode);
+        return;
+      }
+
+      setSwitching(true);
+      const direction = nextMode === "signup" ? 1 : -1;
+      // The image acts as a curtain; change the form only while it is invisible.
+      const swap = gsap.timeline({
+        onComplete: () => {
+          setSwitching(false);
+          requestAnimationFrame(() => modeSwitch.current?.focus({ preventScroll: true }));
+        },
+      });
+      swap.to(formContent.current, { opacity: 0, y: -6, duration: 0.16, ease: "power1.in" }, 0)
+        .call(() => setMode(nextMode), [], 0.18);
+
+      if (desktop) {
+        swap.to(formPanel.current, { xPercent: formX, duration: 0.96, ease: "power3.inOut" }, 0.06)
+          .to(artPanel.current, { xPercent: artX, duration: 0.96, ease: "power3.inOut" }, 0.06)
+          .to(artImage.current, { xPercent: direction * 1.2, scale: 1.035, duration: 0.46, ease: "sine.inOut" }, 0.06)
+          .to(artImage.current, { xPercent: 0, scale: 1, duration: 0.56, ease: "sine.out" }, 0.52);
+      }
+
+      swap.set(formContent.current, { y: 8 }, desktop ? 0.68 : 0.2)
+        .to(formContent.current, { opacity: 1, y: 0, duration: desktop ? 0.4 : 0.26, ease: "power2.out", clearProps: "opacity,transform" }, desktop ? 0.68 : 0.2);
+      panelSwap.current = swap;
+    });
+  }
+
   return (
-    <div className="w-full max-w-sm rounded-xl border border-black/[.08] bg-white p-8 shadow-sm dark:border-white/[.145] dark:bg-zinc-900">
-      <div className="mb-6 flex items-start justify-between">
+    <section ref={card} className="login-card" aria-labelledby="login-title" data-switching={switching} aria-busy={switching}>
+      <div ref={formPanel} className="login-form-panel" lang={lang}>
+      <div ref={formContent} className="login-form-content" inert={switching}>
+      <div className="login-form-header">
         <div>
-          <p className="text-sm text-zinc-500">{s.sub}</p>
-          <h1 className="text-2xl font-semibold">{s.title}</h1>
+          <p className="login-subtitle">{s.sub}</p>
+          <h1 id="login-title" className="login-title">{mode === "signin" ? s.title : s.signup}</h1>
         </div>
-        <div className="flex overflow-hidden rounded-md border border-black/[.12] text-sm dark:border-white/[.2]">
+        <div className="login-language" role="group" aria-label="Language">
           {(["en", "hi"] as const).map((l) => (
             <button
               key={l}
               type="button"
               onClick={() => setLang(l)}
               aria-pressed={lang === l}
-              className={`px-3 py-1 ${lang === l ? "bg-black text-white dark:bg-white dark:text-black" : ""}`}
+              aria-label={l === "en" ? "English" : "हिन्दी"}
             >
               {l === "en" ? "EN" : "हिं"}
             </button>
@@ -90,18 +188,18 @@ export default function LoginForm() {
         </div>
       </div>
 
-      <form action={action} key={mode} className="flex flex-col gap-4">
-        <label className="flex flex-col gap-1 text-sm">
+      <form action={action} key={mode} className="login-fields" aria-busy={pending}>
+        <label className="login-field">
           {s.email}
           <input
             name="email"
             type="email"
             autoComplete="email"
             required
-            className="rounded-md border border-black/[.2] bg-transparent px-3 py-2 dark:border-white/[.25]"
+            className="login-input"
           />
         </label>
-        <label className="flex flex-col gap-1 text-sm">
+        <label className="login-field">
           {s.password}
           <input
             name="password"
@@ -109,13 +207,14 @@ export default function LoginForm() {
             autoComplete={mode === "signin" ? "current-password" : "new-password"}
             required
             minLength={mode === "signup" ? 8 : undefined}
-            className="rounded-md border border-black/[.2] bg-transparent px-3 py-2 dark:border-white/[.25]"
+            aria-describedby={mode === "signup" ? "password-hint" : undefined}
+            className="login-input"
           />
-          {mode === "signup" && <span className="text-xs text-zinc-500">{s.hint}</span>}
+          {mode === "signup" && <span id="password-hint" className="login-hint">{s.hint}</span>}
         </label>
 
         {errorText && (
-          <p role="alert" className="rounded-md bg-red-50 px-3 py-2 text-sm text-red-700 dark:bg-red-950 dark:text-red-300">
+          <p role="alert" className="login-error">
             {errorText}
           </p>
         )}
@@ -123,9 +222,9 @@ export default function LoginForm() {
         <button
           type="submit"
           disabled={pending || demoPending}
-          className="h-11 rounded-md bg-black font-medium text-white disabled:opacity-60 dark:bg-white dark:text-black"
+          className="login-submit"
         >
-          {mode === "signin" ? s.signin : s.signup}
+          {pending ? (mode === "signin" ? s.signingIn : s.creating) : (mode === "signin" ? s.signin : s.signup)}
         </button>
       </form>
 
@@ -142,11 +241,18 @@ export default function LoginForm() {
 
       <button
         type="button"
-        onClick={() => setMode(mode === "signin" ? "signup" : "signin")}
-        className="mt-4 text-sm text-zinc-600 underline dark:text-zinc-400"
+        ref={modeSwitch}
+        disabled={pending || demoPending || switching}
+        onClick={switchMode}
+        className="login-mode-switch"
       >
         {mode === "signin" ? s.toSignup : s.toSignin}
       </button>
-    </div>
+      </div>
+      </div>
+      <div ref={artPanel} className="login-art" aria-hidden="true">
+        <div ref={artImage} className="login-art-image" />
+      </div>
+    </section>
   );
 }

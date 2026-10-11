@@ -1,0 +1,76 @@
+.login-page {
+  --cream: #fff0d1;
+  position: relative;
+  isolation: isolate;
+  display: grid;
+  place-items: center;
+  min-height: 100svh;
+  padding: 64px 28px;
+  color: var(--cream);
+  background: #073467 url('/temple-city.png') center / cover no-repeat;
+}
+.login-page::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  background: radial-gradient(ellipse at 50% 45%, rgba(2, 20, 44, .1) 15%, rgba(1, 16, 36, .58) 100%), linear-gradient(rgba(2, 24, 54, .3), rgba(2, 22, 48, .24));
+  pointer-events: none;
+}
+.login-shell { width: min(1140px, 100%); }
+.login-card {
+  display: grid;
+  grid-template-columns: 47.25% 52.75%;
+  min-height: 590px;
+  overflow: hidden;
+  border: 1px solid rgba(189, 216, 245, .6);
+  border-radius: 25px;
+  background: #071323;
+  box-shadow: 0 24px 75px rgba(0, 9, 25, .4), 0 0 0 3px rgba(125, 177, 229, .06), inset 0 1px 0 rgba(255, 255, 255, .06);
+}
+.login-form-panel {
+  position: relative;
+  z-index: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  padding: 62px 56px;
+  background: linear-gradient(135deg, #0a1c36 0%, #050f20 58%, #07172d 100%);
+}
+.login-form-content { display: flex; flex-direction: column; width: 100%; }
+.login-card[data-switching='true'] .login-form-panel,
+.login-card[data-switching='true'] .login-art,
+.login-card[data-switching='true'] .login-art-image { will-change: transform; }
+.login-card[data-switching='true'] .login-form-content { will-change: transform, opacity; }
+.login-form-header { display: flex; justify-content: space-between; align-items: flex-start; gap: 16px; margin-bottom: 28px; }
+.login-subtitle { color: #a1a6b2; font-size: 15px; line-height: 1.5; margin: 0 0 4px; }
+.login-title { font-family: Georgia, 'Times New Roman', serif; font-weight: 500; font-size: clamp(34px, 3.1vw, 46px); letter-spacing: -.035em; line-height: 1.2; margin: 0; }
+.login-form-panel[lang='hi'] .login-title { font-family: var(--font-geist-sans), Arial, sans-serif; font-size: 32px; line-height: 1.5; letter-spacing: 0; }
+.login-language { display: flex; flex-shrink: 0; overflow: hidden; border: 1px solid #b9c2d04a; border-radius: 9px; margin-top: -4px; }
+.login-language button { min-width: 46px; min-height: 36px; padding: 7px 12px; background: transparent; border: 0; color: var(--cream); font-size: 14px; cursor: pointer; transition: background .2s ease, color .2s ease; }
+.login-language button[aria-pressed='true'] { background: var(--cream); color: #081426; }
+.login-language button:hover:not([aria-pressed='true']) { background: #ffffff0d; }
+.login-fields { display: flex; flex-direction: column; gap: 22px; }
+.login-field { display: flex; flex-direction: column; gap: 9px; font-size: 16px; line-height: 1.4; }
+.login-input { width: 100%; height: 54px; padding: 12px 15px; border: 1px solid #a6b1c060; border-radius: 9px; background: #0b192a66; color: var(--cream); font: inherit; caret-color: var(--cream); outline: none; transition: border-color .2s ease, box-shadow .2s ease, background .2s ease; }
+.login-input:hover { border-color: #b9c6d28c; }
+.login-input:focus { border-color: #ffedc5b3; background: #10223899; box-shadow: 0 0 0 3px #ffedc50a; }
+.login-input:-webkit-autofill { -webkit-text-fill-color: var(--cream); box-shadow: 0 0 0 1000px #0b192a inset; caret-color: var(--cream); }
+.login-hint { color: #a7b3c5; font-size: 12px; }
+.login-error { border: 1px solid #f4b9a333; background: #b5563614; color: #ffd0bc; border-radius: 8px; padding: 12px 14px; margin: 0; font-size: 13px; line-height: 1.6; }
+.login-submit { width: 100%; min-height: 55px; margin-top: 2px; padding: 12px 18px; background: var(--cream); color: #091426; border: 1px solid #fff5de; border-radius: 9px; font-size: 18px; font-weight: 600; cursor: pointer; transition: background .2s ease, box-shadow .2s ease; }
+.login-submit:hover:not(:disabled) { background: #ffe5b6; box-shadow: 0 3px 18px #ffedc510; }
+.login-submit:disabled { opacity: .65; cursor: wait; }
+.login-mode-switch { align-self: flex-start; background: none; border: none; padding: 0; margin-top: 23px; color: #c6d0df; font-size: 15px; text-align: left; text-decoration: underline; text-decoration-thickness: 1px; text-underline-offset: 4px; cursor: pointer; transition: color .2s ease; }
+.login-mode-switch:hover { color: var(--cream); }
+.login-art { position: relative; z-index: 2; min-width: 0; overflow: hidden; background: #06417f; border-inline: 1px solid #7cb3eb24; }
+.login-art-image { position: absolute; inset: 0; background: #06417f url('/temple-city.png') 77% center / auto 100% no-repeat; }
+.login-mode-switch:disabled { opacity: .65; cursor: wait; }
+.login-home { display: block; width: fit-content; margin: 22px auto 0; color: #d1d9e6; font-size: 14px; text-decoration: underline; text-underline-offset: 4px; transition: color .2s ease; }
+.login-home:hover { color: var(--cream); }
+.login-page button:focus-visible, .login-home:focus-visible { outline: 2px solid var(--cream); outline-offset: 4px; }
+@media (max-width: 1100px) { .login-shell { max-width: 950px; } .login-form-panel { padding: 48px 36px; } .login-card { min-height: 540px; } .login-title { font-size: 38px; } .login-subtitle { font-size: 13px; } .login-language button { min-width: 40px; padding-inline: 9px; } }
+@media (max-width: 760px) { .login-page { padding: 40px 20px; background-position: 65% center; } .login-shell { max-width: 480px; } .login-card { grid-template-columns: 1fr; min-height: auto; border-radius: 20px; } .login-form-panel { padding: 42px 30px; } .login-art { height: 155px; border-inline: 0; border-top: 1px solid #7cb3eb24; } .login-art-image { background-size: cover; background-position: 65% 72%; } .login-title { font-size: 37px; } .login-form-header { margin-bottom: 27px; } .login-home { margin-top: 20px; } }
+@media (max-width: 380px) { .login-page { padding: 24px 14px; } .login-form-panel { padding: 35px 22px; } .login-title { font-size: 32px; } .login-subtitle { font-size: 12px; } .login-language button { min-width: 35px; padding-inline: 7px; } }
+@media (prefers-reduced-motion: reduce) { .login-page *, .login-page *::before, .login-page *::after { transition: none !important; animation: none !important; } }
