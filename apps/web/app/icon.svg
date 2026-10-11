@@ -1,0 +1,31 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="82" height="82" viewBox="0 0 82 82" role="img" aria-label="Centered cream tilak on a circular navy background">
+  <defs>
+    <clipPath id="circle"><circle cx="41" cy="41" r="41"/></clipPath>
+    <radialGradient id="navy" cx="54%" cy="35%" r="95%">
+      <stop offset="0%" stop-color="#003985"/>
+      <stop offset="62%" stop-color="#003078"/>
+      <stop offset="100%" stop-color="#002B6D"/>
+    </radialGradient>
+    <filter id="subtle-grain" x="0" y="0" width="100%" height="100%">
+      <feTurbulence type="fractalNoise" baseFrequency="0.19" numOctaves="3" seed="7" stitchTiles="stitch"/>
+      <feColorMatrix type="saturate" values="0"/>
+      <feComponentTransfer><feFuncA type="linear" slope="0.06"/></feComponentTransfer>
+    </filter>
+  </defs>
+  <g clip-path="url(#circle)">
+  <rect width="82" height="82" fill="url(#navy)"/>
+  <rect width="82" height="82" fill="#A3C5E5" filter="url(#subtle-grain)" opacity="0.3"/>
+  <g fill="#FFEDC5" transform="translate(-3.8 1.75)">
+    <!-- Central, tall double-tapered blade -->
+    <path d="M45 9.4 50.3 42.5 45 69.1 39.9 43.2Z"/>
+    <!-- Three left-facing tapered bars -->
+    <path d="M12.5 29 20.7 26.1Q25.7 25.5 30.1 25.8L34.8 26.4V31.7H23.1Q17.6 31.2 12.5 29Z"/>
+    <path d="M12.8 41.6 21.6 38.1Q26.4 37.7 30.8 38.2L34.8 38.8V44H23.2Q17.4 43.2 12.8 41.6Z"/>
+    <path d="M12.5 54 20.8 51.1Q26 50.5 30.5 50.9L34.8 51.4V56.7H22.8Q17.2 55.9 12.5 54Z"/>
+    <!-- Three right-facing tapered bars -->
+    <path d="M55.7 26.4 60.3 25.8Q65.1 25.5 69.6 26.1L77.1 29 69.9 31.6H55.7Z"/>
+    <path d="M55.7 38.8 60.3 38.1Q65.4 37.8 69.6 38.5L77 41.8 69.4 44H55.7Z"/>
+    <path d="M55.7 51.4 60.3 50.9Q65.4 50.5 69.6 51.1L77.1 54 69.9 56.6H55.7Z"/>
+  </g>
+  </g>
+</svg>
