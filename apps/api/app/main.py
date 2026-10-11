@@ -5,6 +5,7 @@ from fastapi import Depends, FastAPI, Header, HTTPException
 
 from app.chat import router as chat_router, start_warm_up
 from app.stt import router as stt_router
+from app.speak import router as speak_router
 from app.tts import router as tts_router
 
 
@@ -26,6 +27,7 @@ app = FastAPI(
 app.include_router(chat_router)
 app.add_event_handler("startup", start_warm_up)
 app.include_router(stt_router)
+app.include_router(speak_router)
 app.include_router(tts_router)
 
 
