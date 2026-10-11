@@ -5,6 +5,10 @@ import { after, type NextRequest } from "next/server";
 // without a Supabase session; requests are authenticated by Meta's signature.
 
 const GRAPH_VERSION = process.env.WHATSAPP_GRAPH_VERSION ?? "v23.0";
+const WHATSAPP_MAX_CHARS = 4096;
+
+// The reply is sent in after(); search + two model calls can take a while on a cold API.
+export const maxDuration = 60;
 
 type IncomingMessage = { from: string; id: string; type: string; text?: { body: string } };
 type WebhookPayload = {
@@ -67,9 +71,41 @@ async function handle(payload: WebhookPayload) {
   }
 }
 
-// TODO: call the FastAPI answer endpoint (via BACKEND_URL + BFF_SHARED_SECRET) once it exists.
+type ChatReply = { reply: string; sources: { rule_id: string; title: string; page: number }[] };
+
 async function answer(question: string) {
-  return `Bhumi Vikas Sahayak received your question:\n\n"${question}"\n\nAnswers from the MP Bhumi Vikas Rules, 2012 are coming soon.`;
+  let data: ChatReply;
+  try {
+    const res = await fetch(`${process.env.BACKEND_URL}/chat`, {
+      method: "POST",
+      headers: {
+        "content-type": "application/json",
+        "x-bff-secret": process.env.BFF_SHARED_SECRET!,
+      },
+      body: JSON.stringify({ messages: [{ role: "user", text: question.slice(0, 4000) }] }),
+      cache: "no-store",
+    });
+    if (!res.ok) throw new Error(`chat ${res.status}`);
+    data = (await res.json()) as ChatReply;
+  } catch (err) {
+    console.error("whatsapp answer failed", err);
+    return "Sorry, the rulebook service is not reachable right now. Please try again in a minute.";
+  }
+
+  // WhatsApp bold is *x*, not Markdown's **x**.
+  let text = data.reply.replace(/\*\*(.+?)\*\*/g, "*$1*");
+  // List only the rules the answer cites (first page of each); search also returns weaker hits.
+  const firstPerRule = data.sources.filter(
+    (s, i) => data.sources.findIndex((t) => t.rule_id === s.rule_id) === i,
+  );
+  const cited = firstPerRule.filter((s) =>
+    new RegExp(`(Rule|नियम)\\s*${s.rule_id.replace(/[-]/g, "\\-")}(?![0-9])`, "i").test(text),
+  );
+  const rules = cited.length ? cited : firstPerRule.slice(0, 1);
+  if (rules.length) {
+    text += `\n\n_Sources:_ ${rules.map((s) => `Rule ${s.rule_id} (p. ${s.page})`).join(", ")}`;
+  }
+  return text.length > WHATSAPP_MAX_CHARS ? `${text.slice(0, WHATSAPP_MAX_CHARS - 1)}…` : text;
 }
 
 async function reply(phoneNumberId: string, to: IncomingMessage, body: string) {
