@@ -39,13 +39,17 @@ ROUTER_SYSTEM = (
     "You prepare a clerk's message for a search of the Madhya Pradesh Bhumi Vikas Rules, 2012 (building "
     "permission, plots, setbacks, FAR, fees, floors, lifts, parking, electric-line clearances, authorities).\n"
     "Reply with ONLY a JSON object: {\"intent\": \"rules\" or \"chitchat\", \"language\": \"english\" or "
-    "\"hindi\" or \"hinglish\", \"query\": \"...\"}.\n"
+    "\"hindi\" or \"hinglish\", \"queries\": [\"...\"]}.\n"
     "- intent \"chitchat\": greetings, thanks, 'who are you', 'what can you do', or anything with no "
     "question about land, buildings or the rules.\n"
     "- intent \"rules\": any question that might be answered by the rules, including ones the rules may not "
     "cover.\n"
-    "- query: ONE standalone English search query (use earlier turns only to resolve words like 'it' or "
-    "'that'; keep every number, unit and rule number). For chitchat use an empty string.\n"
+    "- queries: 1 to 3 standalone English search queries, one per distinct thing the user asks (a question about "
+    "height AND fee needs two queries). Use earlier turns only to resolve words like 'it' or 'that'; keep every "
+    "number, unit and rule number. Use plain keywords as a rulebook would word them (e.g. 'lift required "
+    "building height', 'rear open space residential plot area', 'building permission fee residential built-up "
+    "area'). NEVER put the rulebook name, 'Madhya Pradesh', 'Bhumi Vikas', 'rules' or the year in a query - they "
+    "only pull in irrelevant pages. For chitchat use an empty list.\n"
     "Hinglish glossary: zameen/jagah/plot = land/plot; makaan/ghar = house; dukaan = shop; naksha = plan; "
     "manzil/majil = floor/storey; chhat = roof; seedhi = staircase; hadap/kabza/atikraman = encroachment; "
     "padosi = neighbour; nakshe ki manzoori/parmission = building permission; fees/shulk = fee; "
@@ -142,13 +146,13 @@ def _route(history, question):
         obj = json.loads(re.search(r"\{.*\}", raw, re.S).group(0))
         intent = "chitchat" if obj.get("intent") == "chitchat" else "rules"
         language = obj.get("language") if obj.get("language") in ("english", "hindi", "hinglish") else "english"
-        query = (obj.get("query") or "").strip() or question
-        return intent, language, query
+        queries = [q.strip() for q in (obj.get("queries") or []) if isinstance(q, str) and q.strip()][:3]
+        return intent, language, queries or [question]
     except HTTPException:
         raise
     except Exception as e:
         log.warning("router output unusable: %r", e)
-        return "rules", "english", question
+        return "rules", "english", [question]
 
 
 @router.post("/chat")
@@ -158,7 +162,7 @@ def chat(body: ChatIn):
         raise HTTPException(status_code=400, detail="last_message_must_be_user")
     history = turns[-7:]  # keep the prompt small
 
-    intent, language, query = _route(history, turns[-1]["content"])
+    intent, language, queries = _route(history, turns[-1]["content"])
     if DEVANAGARI.search(turns[-1]["content"]):
         language = "hindi"  # script is a certain signal; the model's guess is not
     elif language == "hindi":
@@ -172,7 +176,13 @@ def chat(body: ChatIn):
     if intent == "chitchat":
         return {**base, "reply": say(CHITCHAT_SYSTEM)}
 
-    hits, _ = retrieval.search(query, k_retrieve=30, k_final=8)
+    # One search per distinct thing asked; keep each chunk's best score, then take the top 8 overall.
+    best = {}
+    for q in queries:
+        for h in retrieval.search(q, k_retrieve=30, k_final=6)[0]:
+            if h["chunk_id"] not in best or h["rerank_score"] > best[h["chunk_id"]]["rerank_score"]:
+                best[h["chunk_id"]] = h
+    hits = sorted(best.values(), key=lambda h: -h["rerank_score"])[:8]
     if not hits or hits[0].get("rerank_score", 0) < NOT_FOUND_BELOW:
         return {**base, "reply": say(NOTFOUND_SYSTEM)}
 
@@ -186,4 +196,4 @@ def chat(body: ChatIn):
         if h["rule_id"] not in seen:
             seen.add(h["rule_id"])
             sources.append({"rule_id": h["rule_id"], "title": h["title"], "page": h["page_start"]})
-    return {**base, "reply": reply, "sources": sources, "amendment_warning": bool(AMENDMENT_HINT.search(query))}
+    return {**base, "reply": reply, "sources": sources, "amendment_warning": bool(AMENDMENT_HINT.search(" ".join(queries)))}
