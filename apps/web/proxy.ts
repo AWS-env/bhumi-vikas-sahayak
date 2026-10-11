@@ -4,6 +4,12 @@ import { NextResponse, type NextRequest } from "next/server";
 export async function proxy(request: NextRequest) {
   let response = NextResponse.next({ request });
   const { pathname } = request.nextUrl;
+  // Server actions (login, demo, logout) must reach their handler: a proxy
+  // redirect answers them with HTML, which the client reports as
+  // "An unexpected response was received from the server".
+  if (request.headers.has("next-action")) {
+    return response;
+  }
   const isApi = pathname === "/api" || pathname.startsWith("/api/");
   const isProtected = isApi || pathname === "/chat" || pathname.startsWith("/chat/");
 

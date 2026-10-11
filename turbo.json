@@ -12,7 +12,8 @@
       "env": [
         "BACKEND_URL",
         "BFF_SHARED_SECRET",
-        "WHATSAPP_*"
+        "WHATSAPP_*",
+        "ELEVENLABS_*"
       ]
     },
     "lint": {}

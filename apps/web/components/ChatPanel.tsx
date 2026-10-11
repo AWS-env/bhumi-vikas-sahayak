@@ -31,12 +31,16 @@ interface DisplayMessage {
   retryText?: string;
 }
 
+// Official PDFs served from apps/web/public/rules; PDF page numbers match the English and Hindi editions.
+const RULES_PDF = { en: "MP_Bhumi_Vikas_Rules_2012_EN.pdf", hi: "MP_Bhumi_Vikas_Rules_2012_HI.pdf" } as const;
+
 const NOTE = {
   en: {
     basis: "Based on the MP Bhumi Vikas Rules, 2012, consolidated to 6 March 2025. Amendments after that date are not included. Not legal advice — the clerk decides.",
     amendment:
       "The rules for plots up to 500 sq m were amended on 28 August 2026 (Rule 2(5)(c)). That amendment is NOT included here — please verify the current position.",
     sources: "Sources",
+    openPdf: "open the official PDF at this page",
     rule: "Rule",
     page: "p.",
     retry: "Try again",
@@ -47,6 +51,7 @@ const NOTE = {
     amendment:
       "500 वर्ग मीटर तक के भूखंडों के नियम 28 अगस्त 2026 को संशोधित हुए (नियम 2(5)(c))। वह संशोधन यहाँ शामिल नहीं है — कृपया वर्तमान स्थिति जाँचें।",
     sources: "स्रोत",
+    openPdf: "आधिकारिक PDF इस पृष्ठ पर खोलें",
     rule: "नियम",
     page: "पृ.",
     retry: "फिर कोशिश करें",
@@ -407,14 +412,17 @@ function BotText({ msg }: { msg: DisplayMessage }) {
         <div className="mt-2 flex flex-wrap items-center gap-1.5 border-t border-[#F2E9D0]/15 pt-2 text-xs">
           <span className="text-[#F2E9D0]/60">{t.sources}:</span>
           {sources.map((s) => (
-            <span
+            <a
               key={s.rule_id}
-              title={s.title}
-              className="rounded-full border border-[#F2E9D0]/30 px-2 py-0.5 text-[#F2E9D0]/90"
+              href={`/rules/${msg.language === "hindi" ? RULES_PDF.hi : RULES_PDF.en}#page=${s.page}`}
+              target="_blank"
+              rel="noopener noreferrer"
+              title={`${s.title} — ${t.openPdf}`}
+              className="rounded-full border border-[#F2E9D0]/30 px-2 py-0.5 text-[#F2E9D0]/90 underline-offset-2 transition-colors hover:border-[#F2E9D0]/70 hover:bg-[#F2E9D0]/10 hover:underline focus:outline-none focus:ring-2 focus:ring-[#F2E9D0]/50"
             >
               {t.rule} {s.rule_id} · {t.page}
               {s.page}
-            </span>
+            </a>
           ))}
         </div>
       )}
