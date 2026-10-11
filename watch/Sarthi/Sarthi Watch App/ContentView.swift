@@ -16,12 +16,14 @@ struct ContentView: View {
             VStack(alignment: .leading, spacing: 6) {
                 // Header
                 VStack(alignment: .leading, spacing: 4) {
-                    DomeIcon()
-                        .stroke(Theme.gold, style: StrokeStyle(lineWidth: 1.2, lineCap: .round, lineJoin: .round))
-                        .frame(width: 18, height: 24)
+                    TilakEmblem()
+                        .fill(Theme.cream)
+                        .frame(width: 24, height: 22)
                         .accessibilityHidden(true)
-                    Text("Bhopal Sahayak")
-                        .font(.system(.headline, design: .serif, weight: .medium))
+                    // Matches the web hero wordmark: heavy high-contrast serif with tight tracking.
+                    Text("Sarthi")
+                        .font(.system(.title2, design: .serif, weight: .bold))
+                        .tracking(-1)
                         .foregroundStyle(Theme.cream)
                         .lineLimit(1)
                         .minimumScaleFactor(0.7)
@@ -293,51 +295,86 @@ private struct MicButtonLabel: View {
     }
 }
 
-// MARK: - Dome Icon
+// MARK: - Tilak Emblem
 
-/// Line-art domed pavilion used as the app's header mark.
-private struct DomeIcon: Shape {
+/// The Sarthi tilak mark from the web favicon (`apps/web/app/icon.svg`):
+/// a central double-tapered blade flanked by three tapered bars on each side.
+private struct TilakEmblem: Shape {
+    /// Bounding box of the glyph in the SVG's coordinate space.
+    private static let bounds = CGRect(x: 12.5, y: 9.4, width: 64.6, height: 59.7)
+
     func path(in rect: CGRect) -> Path {
-        var path = Path()
-        let w = rect.width
-        let h = rect.height
-        let x = rect.minX
-        let y = rect.minY
-
-        // Finial
-        path.move(to: CGPoint(x: x + w * 0.5, y: y))
-        path.addLine(to: CGPoint(x: x + w * 0.5, y: y + h * 0.12))
-        path.addEllipse(in: CGRect(x: x + w * 0.44, y: y + h * 0.12, width: w * 0.12, height: h * 0.06))
-
-        // Dome
-        path.move(to: CGPoint(x: x + w * 0.12, y: y + h * 0.45))
-        path.addQuadCurve(
-            to: CGPoint(x: x + w * 0.88, y: y + h * 0.45),
-            control: CGPoint(x: x + w * 0.5, y: y + h * 0.02)
-        )
-        path.addLine(to: CGPoint(x: x + w * 0.12, y: y + h * 0.45))
-
-        // Cornice
-        path.addRect(CGRect(x: x + w * 0.04, y: y + h * 0.45, width: w * 0.92, height: h * 0.07))
-
-        // Arches
-        let archTop = y + h * 0.62
-        let base = y + h * 0.94
-        for i in 0..<3 {
-            let left = x + w * (0.14 + CGFloat(i) * 0.25)
-            let right = left + w * 0.2
-            path.move(to: CGPoint(x: left, y: base))
-            path.addLine(to: CGPoint(x: left, y: archTop))
-            path.addQuadCurve(
-                to: CGPoint(x: right, y: archTop),
-                control: CGPoint(x: (left + right) / 2, y: archTop - h * 0.08)
-            )
-            path.addLine(to: CGPoint(x: right, y: base))
+        // Scale the SVG coordinates uniformly to fit, centred in `rect`.
+        let b = Self.bounds
+        let scale = min(rect.width / b.width, rect.height / b.height)
+        let originX = rect.midX - b.width * scale / 2
+        let originY = rect.midY - b.height * scale / 2
+        func pt(_ x: CGFloat, _ y: CGFloat) -> CGPoint {
+            CGPoint(x: originX + (x - b.minX) * scale, y: originY + (y - b.minY) * scale)
         }
 
-        // Plinth
-        path.move(to: CGPoint(x: x, y: base))
-        path.addLine(to: CGPoint(x: x + w, y: base))
+        var path = Path()
+
+        // Central blade
+        path.move(to: pt(45, 9.4))
+        path.addLine(to: pt(50.3, 42.5))
+        path.addLine(to: pt(45, 69.1))
+        path.addLine(to: pt(39.9, 43.2))
+        path.closeSubpath()
+
+        // Left-facing bars
+        path.move(to: pt(12.5, 29))
+        path.addLine(to: pt(20.7, 26.1))
+        path.addQuadCurve(to: pt(30.1, 25.8), control: pt(25.7, 25.5))
+        path.addLine(to: pt(34.8, 26.4))
+        path.addLine(to: pt(34.8, 31.7))
+        path.addLine(to: pt(23.1, 31.7))
+        path.addQuadCurve(to: pt(12.5, 29), control: pt(17.6, 31.2))
+        path.closeSubpath()
+
+        path.move(to: pt(12.8, 41.6))
+        path.addLine(to: pt(21.6, 38.1))
+        path.addQuadCurve(to: pt(30.8, 38.2), control: pt(26.4, 37.7))
+        path.addLine(to: pt(34.8, 38.8))
+        path.addLine(to: pt(34.8, 44))
+        path.addLine(to: pt(23.2, 44))
+        path.addQuadCurve(to: pt(12.8, 41.6), control: pt(17.4, 43.2))
+        path.closeSubpath()
+
+        path.move(to: pt(12.5, 54))
+        path.addLine(to: pt(20.8, 51.1))
+        path.addQuadCurve(to: pt(30.5, 50.9), control: pt(26, 50.5))
+        path.addLine(to: pt(34.8, 51.4))
+        path.addLine(to: pt(34.8, 56.7))
+        path.addLine(to: pt(22.8, 56.7))
+        path.addQuadCurve(to: pt(12.5, 54), control: pt(17.2, 55.9))
+        path.closeSubpath()
+
+        // Right-facing bars
+        path.move(to: pt(55.7, 26.4))
+        path.addLine(to: pt(60.3, 25.8))
+        path.addQuadCurve(to: pt(69.6, 26.1), control: pt(65.1, 25.5))
+        path.addLine(to: pt(77.1, 29))
+        path.addLine(to: pt(69.9, 31.6))
+        path.addLine(to: pt(55.7, 31.6))
+        path.closeSubpath()
+
+        path.move(to: pt(55.7, 38.8))
+        path.addLine(to: pt(60.3, 38.1))
+        path.addQuadCurve(to: pt(69.6, 38.5), control: pt(65.4, 37.8))
+        path.addLine(to: pt(77, 41.8))
+        path.addLine(to: pt(69.4, 44))
+        path.addLine(to: pt(55.7, 44))
+        path.closeSubpath()
+
+        path.move(to: pt(55.7, 51.4))
+        path.addLine(to: pt(60.3, 50.9))
+        path.addQuadCurve(to: pt(69.6, 51.1), control: pt(65.4, 50.5))
+        path.addLine(to: pt(77.1, 54))
+        path.addLine(to: pt(69.9, 56.6))
+        path.addLine(to: pt(55.7, 56.6))
+        path.closeSubpath()
+
         return path
     }
 }
