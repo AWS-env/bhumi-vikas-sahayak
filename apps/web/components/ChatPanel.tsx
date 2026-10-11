@@ -5,6 +5,7 @@ import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
 import MicButton from "./MicButton";
 import SpeakButton from "./SpeakButton";
+import SarthiWordmark from "./SarthiWordmark";
 
 const MAX_INPUT_HEIGHT_PX = 160; // about 6 lines, then the box scrolls
 const MAX_INPUT_CHARS = 2000;
@@ -292,7 +293,7 @@ export default function ChatPanel() {
         }
         aria-label="Your question"
         disabled={isLoading}
-        className={`flex-1 resize-none overflow-y-auto rounded-2xl border border-transparent px-4 py-2.5 text-sm leading-6 outline-none transition-colors focus:border-[#F2E9D0]/40 ${C.inputField}`}
+        className={`chat-scroll flex-1 resize-none overflow-y-auto rounded-2xl border border-transparent px-4 py-2.5 text-sm leading-6 outline-none transition-colors focus:border-[#F2E9D0]/40 ${C.inputField}`}
       />
       <MicButton
         disabled={isLoading}
@@ -327,8 +328,8 @@ export default function ChatPanel() {
               : "invisible mb-0 max-h-0 scale-95 -translate-y-8 gap-0 opacity-0"
           }`}
         >
-          <h1 className="text-center text-3xl font-semibold tracking-tight text-[#F2E9D0] sm:text-4xl">
-            Bhumi Vikas Sahayak
+          <h1 className="chat-greeting-title">
+            <SarthiWordmark />
           </h1>
           <p className={`text-center text-sm ${C.muted}`}>
             Ask about the MP Bhumi Vikas Rules, 2012 — in English or Hindi.
@@ -338,7 +339,7 @@ export default function ChatPanel() {
         {/* Messages area */}
         <div
           ref={scrollRef}
-          className={`min-h-0 w-full overflow-y-auto px-4 transition-all duration-700 ease-[cubic-bezier(0.25,1,0.5,1)] ${
+          className={`chat-scroll min-h-0 w-full overflow-y-auto px-4 transition-all duration-700 ease-[cubic-bezier(0.25,1,0.5,1)] ${
             isInitialView ? "flex-[0_1_0%] py-0 opacity-0" : "flex-[1_1_0%] py-3 opacity-100"
           }`}
           style={{ display: "flex", flexDirection: "column" }}

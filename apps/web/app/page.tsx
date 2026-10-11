@@ -85,7 +85,7 @@ export default function Home() {
         <nav className="main-nav" aria-label="Main navigation">
           {navigation.map((item) => <button key={item.panel} className="nav-link header-reveal" onClick={() => openPanel(item.panel)}>{item.label}</button>)}
         </nav>
-        <button className="get-started header-reveal" onClick={() => openPanel("start")}><span>Login</span><Arrow /></button>
+        <Link className="get-started header-reveal" href="/login"><span>Login</span><Arrow /></Link>
       </header>
 
       <section className="hero-copy" id="main-content" aria-labelledby="hero-title">
