@@ -89,6 +89,11 @@ ANSWER_SYSTEM = (
     "- If the answer depends on a fact the user did not give (plot area, road width, building height, use), "
     "say which fact is needed and give the answer for each case in the excerpts.\n"
     "- If the excerpts are only loosely related, say so instead of stretching them.\n"
+    "- NEVER treat silence as a ban: if the excerpts do not mention something, say \"the rules do not mention "
+    "it\" - do not say it is permitted and do not say it is prohibited. Say \"Not permitted\" only when an "
+    "excerpt itself prohibits it. A table with no row for the user's value (e.g. no row for a 9 m road) means "
+    "\"the table does not cover that value\" - never conclude that something is refused or \"cannot be "
+    "approved\" from a missing row; say what the table covers and tell the clerk to confirm with the Authority.\n"
     "End with nothing else: no disclaimers, the app adds them. "
 )
 
