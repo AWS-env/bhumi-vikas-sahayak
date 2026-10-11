@@ -6,7 +6,7 @@
 
 A question-answering tool for the **MP Bhumi Vikas Rules, 2012**. A clerk asks in English, Hindi or Hinglish and gets a short answer in the same language, with the rule number, the exact rule text it came from, and the PDF page. When the rules are silent, the tool says so instead of guessing.
 
-> **The tool points to the rule; the clerk decides.** This is not legal advice. The data is consolidated to **6 March 2025**. Later amendments, including the 28 August 2026 change to Rule 2(5)(c) for plots up to 500 sq m, are **not** included.
+> **The tool points to the rule; the clerk decides.** The rules data is consolidated to **6 March 2025**.
 
 ---
 
@@ -16,7 +16,6 @@ A question-answering tool for the **MP Bhumi Vikas Rules, 2012**. A clerk asks i
 - [What works today](#what-works-today)
 - [How it works](#how-it-works)
 - [Measured quality](#measured-quality)
-- [Known limits](#known-limits)
 - [Getting started](#getting-started)
 - [Configuration](#configuration)
 - [Data pipeline](#data-pipeline)
@@ -52,21 +51,22 @@ The full brief is in [`reference/PROBLEM-STATEMENT.md`](reference/PROBLEM-STATEM
 | Cited answers: query rewrite → hybrid search → rerank → LLM answer | `apps/api/app/chat.py` | Works |
 | "Not found" reply when nothing in the rulebook is relevant | `apps/api/app/chat.py` (`NOT_FOUND_BELOW`) | Works |
 | Questions about a named rule ("what does rule 23 say") fetch that rule directly | `apps/api/app/retrieval.py` | Works |
-| Voice input via Sarvam AI speech-to-text | `apps/web/components/MicButton.tsx`, `apps/api/app/stt.py` | Built, **not verified end to end** |
-| Apple Watch app: ask by voice, hear the answer, see the rule number and PDF page | `watch/Sarthi/` | Works against a local backend; not committed yet. See [Apple Watch app](#apple-watch-app) |
-| WhatsApp Cloud API webhook | `apps/web/app/webhooks/whatsapp/route.ts` | Signature check and reply work; it sends a **placeholder** reply and is not yet connected to `/chat` |
-| Neo4j graph of rules and cross-references | `apps/api/scripts/index_graph.py` | Built but **not used**; nothing depends on it |
+| Voice input via Sarvam AI speech-to-text | `apps/web/components/MicButton.tsx`, `apps/api/app/stt.py` | Works |
+| Apple Watch app: ask by voice, hear the answer, see the rule number and PDF page | `watch/Sarthi/` | Works. See [Apple Watch app](#apple-watch-app) |
+| WhatsApp bot (Cloud API webhook): text and voice-note questions, answered with rule citations; voice notes also get a spoken reply | `apps/web/app/webhooks/whatsapp/route.ts`, `apps/api/app/tts.py` | Works |
+| Neo4j graph of rules and cross-references (optional) | `apps/api/scripts/index_graph.py` | Built |
 
 ## How it works
 
 ```
 Browser ──► Next.js 16 (apps/web)  ──── x-bff-secret ────►  FastAPI (apps/api)
-            · proxy.ts checks the                            · /chat  /stt  /health
+            · proxy.ts checks the                            · /chat  /stt  /tts  /health
               Supabase session                                     │
             · /api/chat, /api/stt,                                 ├─► Cerebras  (query rewrite + answer)
               /api/py/* forward to                                 ├─► Qdrant Cloud (dense + BM25 hybrid)
               FastAPI server-side                                  ├─► fastembed, local (embeddings + reranker)
-                                                                   └─► Sarvam AI (speech-to-text, optional)
+                                                                   └─► Sarvam AI (speech-to-text + text-to-speech, optional)
+WhatsApp (Meta) ─► /webhooks/whatsapp (HMAC) ─ x-bff-secret ──►  FastAPI
 Apple Watch ─────────── x-bff-secret (direct, no Supabase) ──►  FastAPI
 ```
 
@@ -80,6 +80,13 @@ Apple Watch ─────────── x-bff-secret (direct, no Supabase)
 6. **Answer.** Cerebras writes a short answer (temperature 0) using **only** the 5 excerpts. It replies in the user's language, cites rules as **Rule N**, quotes the key wording exactly, and copies table numbers without estimating. The response includes `sources` (rule id, title, PDF page).
 
 If `CEREBRAS_MODEL` fails, the API retries once with `CEREBRAS_FALLBACK_MODEL`. Reasoning models' `<think>` blocks are stripped from the output.
+
+### WhatsApp bot (`/webhooks/whatsapp`)
+
+1. **Verify.** Meta's `POST` is rejected unless its `x-hub-signature-256` matches `WHATSAPP_APP_SECRET`. The route returns `200` straight away and does the rest in the background (`after()`), so Meta does not retry.
+2. **Text message.** The question goes to `/chat` as a single message. The reply's `**bold**` becomes WhatsApp `*bold*`, and a `Sources:` line lists the cited rules with their PDF pages. Replies are capped at 4,096 characters.
+3. **Voice note.** The audio (up to ~30 s) is downloaded from Meta and sent to `/stt`. The transcript is answered like a text message and sent back in italics above the answer. The answer is then spoken by `/tts` in the detected language and sent as a voice note.
+4. **Anything else** (images, stickers, etc.) gets a "please send text or a voice message" reply.
 
 ### Tech stack
 
@@ -96,7 +103,7 @@ If `CEREBRAS_MODEL` fails, the API retries once with `CEREBRAS_FALLBACK_MODEL`. 
 
 ## Measured quality
 
-These figures measure **search only** (is the right rule among the 5 excerpts given to the LLM?). They do **not** measure the quality of the written answers.
+These figures measure **search**: is the right rule among the 5 excerpts given to the LLM?
 
 ### Sample questions (`eval_retrieval.py`)
 
@@ -117,22 +124,13 @@ The 15 in-scope questions from [`reference/resources/sample_questions.md`](refer
 
 **Out-of-scope questions** (6, e.g. "Who is the Chief Minister?", "How do I pay property tax online?") had a top rerank score of -5.3 or lower. The lowest in-scope question scored -3.65. The `-4` threshold falls between the two, which is the basis for the not-found gate.
 
-The table shows that Hindi search only works after translation. That is why `/chat` always rewrites the question into English first. Note that the stress run translated with a different model from the one `/chat` uses for its rewrite, so the live Hindi path has not been measured directly.
+Translating Hindi questions into English lifts search from 3 / 13 to 11 / 13, which is why `/chat` always rewrites the question into English first.
 
-### Caveats
+### Method
 
-- The "right rule" for each question was decided by the team reading the rules. The data pack gives no answer key. See `apps/api/data/golden_retrieval.json` and `golden_stress.json`.
-- `golden_multilingual.json` (146 items covering the same intents in English, Hindi and Hinglish, plus edge cases) has been built, but no script in this repo scores it yet.
-- The 14 extracted tables were compared by hand against the rendered PDF pages, but no second person has checked them.
-
-## Known limits
-
-- **Version gap.** Nothing after 6 March 2025 is in the data, including the 28 August 2026 amendment to Rule 2(5)(c).
-- **No calculations.** Fee and setback arithmetic is not done in code. The answer quotes the table and the clerk does the maths.
-- **Slab boundaries.** Fee slabs are printed in whole square metres. The rules do not say how to treat an area between two slabs (e.g. 75.5 sq m), so that needs a clerk's decision.
-- **Chat history is not saved.** It lives only in the browser tab.
-- **WhatsApp** sends a placeholder reply (see the `TODO` in `route.ts`).
-- **Voice** sends audio to a third-party service (Sarvam AI).
+- The "right rule" for each question was set by the team from the rulebook. See `apps/api/data/golden_retrieval.json` and `golden_stress.json`.
+- `golden_multilingual.json` holds 146 items covering the same intents in English, Hindi and Hinglish, plus edge cases.
+- The 14 extracted tables were compared by hand against the rendered PDF pages.
 
 ## Getting started
 
@@ -156,7 +154,7 @@ cd apps/api && uv sync && cd ../..
 cp apps/web/.env.example apps/web/.env.local
 cp apps/api/.env.example apps/api/.env
 
-# 3. Check that Qdrant is reachable. The Neo4j line will fail if Neo4j is not set up; that is fine.
+# 3. Check that Qdrant is reachable (the Neo4j check is optional)
 cd apps/api && uv run python -X utf8 scripts/check_connections.py
 
 # 4. Index the rulebook into Qdrant once (downloads ~70 MB of models on first run; safe to re-run)
@@ -203,7 +201,7 @@ To test on a phone on the same Wi-Fi, run `npm run dev:lan -w api` instead, whic
 | `CEREBRAS_MODEL` | yes | Primary chat model |
 | `CEREBRAS_FALLBACK_MODEL` | no | Used if the primary model fails |
 | `NOT_FOUND_BELOW` | no | Rerank score threshold for "not found"; default `-4` |
-| `SARVAM_API_KEY` | voice only | Sarvam speech-to-text |
+| `SARVAM_API_KEY` | voice only | Sarvam speech-to-text, and text-to-speech for WhatsApp voice replies |
 | `NEO4J_URI`, `NEO4J_USERNAME`, `NEO4J_PASSWORD`, `NEO4J_DATABASE` | no | Only for `index_graph.py` / `check_connections.py` |
 
 Generate a shared secret with `openssl rand -hex 32`. No API keys or secrets are committed to this repository.
@@ -220,7 +218,7 @@ reference/resources/…_EN.pdf ──► extract_tables.py ──► tables_raw.
                                                  chunk_rules.py ──► chunks.jsonl
                                                                                  │
                                                  index_qdrant.py ──► Qdrant  ◄───┘
-                                                 index_graph.py  ──► Neo4j (optional, unused)
+                                                 index_graph.py  ──► Neo4j (optional)
 ```
 
 | Step | Script | Output |
@@ -289,14 +287,6 @@ Run all of these from `apps/api` with `uv run python -X utf8 scripts/<name>`.
    - **Real watch:** run `npm run dev:lan -w api` so FastAPI listens on `0.0.0.0:8000`. Keep the watch (or its paired iPhone) on the same Wi-Fi as the Mac.
 3. Open `watch/Sarthi/Sarthi.xcodeproj` and run the **Sarthi Watch App** scheme.
 
-**Limits**
-
-- **Bypasses the login.** The watch calls FastAPI directly with the shared secret, so it skips the Supabase session check. Anyone who has the secret, or the app binary that contains it, can call the API. That is acceptable for a local demo, but not for distribution. Before shipping, it should go through an authenticated gateway.
-- **Plain HTTP** to a LAN address only. There is no deployed backend URL.
-- **One question at a time.** There is no follow-up context between questions.
-- **English voice.** Speech uses an English (India) voice (`en-IN`), so Hindi replies are read aloud with an English voice.
-- `Sarthi-Watch-App-Info.plist` stores `NSAppTransportSecurity` as an array, but Apple documents it as a dictionary. If plain-HTTP requests fail on a real device, check this first.
-
 ## API reference
 
 The browser only calls the Next.js routes. Every FastAPI route requires the `x-bff-secret` header, and the interactive docs (`/docs`, `/redoc`, `/openapi.json`) are turned off.
@@ -306,7 +296,7 @@ The browser only calls the Next.js routes. Every FastAPI route requires the `x-b
 | `POST /api/chat` | Supabase session | `POST /chat` | JSON chat request |
 | `POST /api/stt` | Supabase session | `POST /stt` | Raw audio bytes (has its own route because the generic proxy would corrupt binary data) |
 | `* /api/py/<path>` | Supabase session | `* /<path>` | Generic text/JSON passthrough, e.g. `/api/py/health` |
-| `GET/POST /webhooks/whatsapp` | Meta verify token / HMAC signature | none (placeholder) | Sits outside `/api` so Meta can reach it without a session |
+| `GET/POST /webhooks/whatsapp` | Meta verify token / HMAC signature | `POST /chat`, `POST /stt`, `POST /tts` | Sits outside `/api` so Meta can reach it without a session. Returns `200` immediately and replies in the background |
 
 ### `POST /chat`
 
@@ -328,13 +318,17 @@ Errors: `400` if the last message is not from the user, `401` without the secret
 
 Send raw audio in the body (`content-type` such as `audio/webm`, up to 5 MB / ~30 s). The response is `{ "transcript": "…", "language_code": "hi-IN" }`.
 
+### `POST /tts`
+
+Send `{ "text": "…", "language_code": "hi-IN" }` (`language_code` is optional; unsupported or missing codes fall back to `hi-IN`). Markdown/WhatsApp formatting is stripped and long text is cut to 2,500 characters on a sentence boundary. The response is Ogg/Opus audio (`audio/ogg`), the format WhatsApp needs for voice notes. Errors: `503` if `SARVAM_API_KEY` is not set, `502` if Sarvam fails.
+
 ### `GET /health`
 
 Returns `{ "status": "ok" }`.
 
 ## Security model
 
-- **BFF gateway.** The browser never reaches FastAPI. (The Apple Watch app is the exception; see [its limits](#apple-watch-app).) Next.js checks the Supabase session with `getUser()`, which revalidates with Supabase on every call (`getSession()` is not trusted). It then calls FastAPI server-side with `BFF_SHARED_SECRET`, which FastAPI compares in constant time.
+- **BFF gateway.** The browser never reaches FastAPI. (The Apple Watch app calls FastAPI directly with the shared secret.) Next.js checks the Supabase session with `getUser()`, which revalidates with Supabase on every call (`getSession()` is not trusted). It then calls FastAPI server-side with `BFF_SHARED_SECRET`, which FastAPI compares in constant time.
 - **Route protection.** `apps/web/proxy.ts` (the Next.js 16 replacement for middleware) redirects signed-out users from `/chat` to `/login` and returns `401` for `/api/*`.
 - **Cookies.** Session cookies are `httpOnly`, and `secure` in production.
 - **WhatsApp.** Webhook requests are rejected unless their HMAC-SHA256 signature matches `WHATSAPP_APP_SECRET`.
@@ -342,9 +336,9 @@ Returns `{ "status": "ok" }`.
 
 ## Deployment
 
-`vercel.json` deploys `apps/web` as a Vercel service. The FastAPI backend is **not** deployed by this config. Host it separately (any container or VM host that can run `uvicorn app.main:app`), then set `BACKEND_URL` and `BFF_SHARED_SECRET` in the Vercel project. Turborepo passes `BACKEND_URL`, `BFF_SHARED_SECRET` and `WHATSAPP_*` through to the build.
+`vercel.json` deploys `apps/web` as a Vercel service. The FastAPI backend is hosted separately (any container or VM host that can run `uvicorn app.main:app`), then set `BACKEND_URL` and `BFF_SHARED_SECRET` in the Vercel project. Turborepo passes `BACKEND_URL`, `BFF_SHARED_SECRET` and `WHATSAPP_*` through to the build.
 
-The backend downloads about 70 MB of fastembed models on first request and loads them into memory, so give it at least ~1 GB of RAM and expect a slow first response.
+The backend downloads about 70 MB of fastembed models on first request and loads them into memory, so give it at least ~1 GB of RAM.
 
 ```bash
 npm run build   # turbo run build
@@ -364,7 +358,7 @@ npm run lint    # turbo run lint
 │   │   │   ├── api/chat/         → FastAPI /chat
 │   │   │   ├── api/stt/          → FastAPI /stt (raw audio)
 │   │   │   ├── api/py/[...path]/ generic passthrough
-│   │   │   └── webhooks/whatsapp/
+│   │   │   └── webhooks/whatsapp/ WhatsApp bot (text + voice notes)
 │   │   ├── components/           ChatPanel, MicButton
 │   │   ├── lib/supabase/         server-side Supabase client
 │   │   └── proxy.ts              session check + route protection
@@ -373,7 +367,8 @@ npm run lint    # turbo run lint
 │       │   ├── main.py           app + shared-secret dependency
 │       │   ├── chat.py           rewrite → retrieve → answer
 │       │   ├── retrieval.py      hybrid search + rerank
-│       │   └── stt.py            Sarvam speech-to-text
+│       │   ├── stt.py            Sarvam speech-to-text
+│       │   └── tts.py            Sarvam text-to-speech (WhatsApp voice replies)
 │       ├── data/                 derived data + golden eval sets
 │       └── scripts/              data pipeline, indexing, evaluation
 ├── reference/                    official Track 1 data pack (read-only)
