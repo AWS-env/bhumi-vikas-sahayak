@@ -108,7 +108,7 @@ async function handleVoice(phoneNumberId: string, message: IncomingMessage, audi
   }
 
   const result = await answer(transcript.transcript);
-  await reply(phoneNumberId, message, `🎤 _${transcript.transcript}_\n\n${result.text}`);
+  await reply(phoneNumberId, message, `_${transcript.transcript}_\n\n${result.text}`);
   if (result.ok) await replyWithVoice(phoneNumberId, message, result.spoken, transcript.language_code);
 }
 
