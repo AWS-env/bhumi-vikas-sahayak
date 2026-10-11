@@ -1,0 +1,893 @@
+[
+ {
+  "id": "r56_front_open_space",
+  "rule": "56",
+  "title": "Rule 56(1)(a): front open space, residential buildings up to 12.5 m height",
+  "pages": [
+   77
+  ],
+  "columns": [
+   "Width of street facing the plot",
+   "Front open space Min."
+  ],
+  "rows": [
+   [
+    "Up to 9.0 meters",
+    "3.0 meters"
+   ],
+   [
+    "More than 9.0 meters and up to 12 meters",
+    "3.6 meters"
+   ],
+   [
+    "More than 12.0 meters and up to 18 meters",
+    "4.5 meters"
+   ],
+   [
+    "Above 18 meters",
+    "6.0 meters"
+   ]
+  ],
+  "verified": true,
+  "bands": [
+   {
+    "street_width_over_m": null,
+    "street_width_upto_m": 9.0,
+    "front_open_space_m": 3.0
+   },
+   {
+    "street_width_over_m": 9.0,
+    "street_width_upto_m": 12.0,
+    "front_open_space_m": 3.6
+   },
+   {
+    "street_width_over_m": 12.0,
+    "street_width_upto_m": 18.0,
+    "front_open_space_m": 4.5
+   },
+   {
+    "street_width_over_m": 18.0,
+    "street_width_upto_m": null,
+    "front_open_space_m": 6.0
+   }
+  ],
+  "verification": {
+   "by": "agent",
+   "method": "compared extracted rows with rendered PDF page image",
+   "date": "2026-10-11",
+   "independent_human_check": false
+  }
+ },
+ {
+  "id": "r56_rear_open_space",
+  "rule": "56",
+  "title": "Rule 56(2)(a): rear open space, residential buildings up to 12.5 m height",
+  "pages": [
+   78
+  ],
+  "columns": [
+   "Plot area in Square meters",
+   "Minimum Rear Open space in meters"
+  ],
+  "rows": [
+   [
+    "Up to 40.00",
+    "Nil"
+   ],
+   [
+    "Above 40.00 and up to 150.00",
+    "1.50"
+   ],
+   [
+    "Above 150 and up to 225.00",
+    "2.50"
+   ],
+   [
+    "Above 225.00",
+    "3.00"
+   ]
+  ],
+  "verified": true,
+  "bands": [
+   {
+    "plot_area_over_sqm": null,
+    "plot_area_upto_sqm": 40.0,
+    "rear_open_space_m": 0.0
+   },
+   {
+    "plot_area_over_sqm": 40.0,
+    "plot_area_upto_sqm": 150.0,
+    "rear_open_space_m": 1.5
+   },
+   {
+    "plot_area_over_sqm": 150.0,
+    "plot_area_upto_sqm": 225.0,
+    "rear_open_space_m": 2.5
+   },
+   {
+    "plot_area_over_sqm": 225.0,
+    "plot_area_upto_sqm": null,
+    "rear_open_space_m": 3.0
+   }
+  ],
+  "notes": "Plots up to 40 sq m: printed as 'Nil'.",
+  "verification": {
+   "by": "agent",
+   "method": "compared extracted rows with rendered PDF page image",
+   "date": "2026-10-11",
+   "independent_human_check": false
+  }
+ },
+ {
+  "id": "r56_ventilation_shaft",
+  "rule": "56",
+  "title": "Rule 56(6)(b): ventilation shaft size",
+  "pages": [
+   79
+  ],
+  "columns": [
+   "Height of buildings in meters",
+   "Size of ventilation shaft in square meters",
+   "Minimum size of a side of shaft in meters"
+  ],
+  "rows": [
+   [
+    "Up to 10",
+    "1.2",
+    "0.9"
+   ],
+   [
+    "12.5",
+    "2.8",
+    "1.2"
+   ],
+   [
+    "18",
+    "4.0",
+    "1.5"
+   ],
+   [
+    "24",
+    "5.4",
+    "1.8"
+   ],
+   [
+    "30",
+    "8.0",
+    "2.4"
+   ],
+   [
+    "above 30",
+    "9.0",
+    "3.0"
+   ]
+  ],
+  "verified": true,
+  "notes": "Extractor returned this table as one merged row; split by hand into 6 rows (6 values per column).",
+  "verification": {
+   "by": "agent",
+   "method": "compared extracted rows with rendered PDF page image",
+   "date": "2026-10-11",
+   "independent_human_check": false
+  }
+ },
+ {
+  "id": "r21_3a_permission_fee_development",
+  "rule": "21",
+  "title": "Rule 21(3)(a): permission fee for development of land (Rs./Hectare)",
+  "pages": [
+   35
+  ],
+  "columns": [
+   "Land use zone",
+   "Population more than 10 lakhs",
+   "Population 5 to 10 lakhs",
+   "Population less than 5 lakhs"
+  ],
+  "rows": [
+   [
+    "Residential or Public and, semi Public or Industrial or Transportation",
+    "75,000",
+    "50,000",
+    "25,000"
+   ],
+   [
+    "Commercial",
+    "1,50,000",
+    "1,25,000",
+    "1,00,000"
+   ],
+   [
+    "Recreational or agriculture or other",
+    "30,000",
+    "20,000",
+    "10,000"
+   ]
+  ],
+  "verified": true,
+  "verification": {
+   "by": "agent",
+   "method": "compared extracted rows with rendered PDF page image",
+   "date": "2026-10-11",
+   "independent_human_check": false
+  }
+ },
+ {
+  "id": "r21_3b_building_fee_residential",
+  "rule": "21",
+  "title": "Rule 21(3)(b) item 1: building permission fee, residence, by built-up area",
+  "pages": [
+   36
+  ],
+  "columns": [
+   "Built up area from sq.m.",
+   "To sq.m.",
+   "Fee in Rs."
+  ],
+  "rows": [
+   [
+    "0",
+    "75",
+    "750"
+   ],
+   [
+    "76",
+    "125",
+    "1,250"
+   ],
+   [
+    "126",
+    "200",
+    "2,000"
+   ],
+   [
+    "201",
+    "300",
+    "3,000"
+   ],
+   [
+    "301",
+    "400",
+    "4,000"
+   ],
+   [
+    "401",
+    "600",
+    "6,000"
+   ],
+   [
+    "601",
+    "750",
+    "7,500"
+   ],
+   [
+    "751",
+    "1,000",
+    "10,000"
+   ],
+   [
+    "1,001",
+    "1,250",
+    "12,500"
+   ],
+   [
+    "1,251",
+    "1,500",
+    "15,000"
+   ],
+   [
+    "1,501",
+    "2,000",
+    "20,000"
+   ],
+   [
+    "2,001",
+    "2,500",
+    "25,000"
+   ],
+   [
+    "above 2500",
+    "",
+    "50,000"
+   ]
+  ],
+  "verified": true,
+  "bands": [
+   {
+    "from_sqm": 0.0,
+    "to_sqm": 75.0,
+    "fee_rs": 750.0
+   },
+   {
+    "from_sqm": 76.0,
+    "to_sqm": 125.0,
+    "fee_rs": 1250.0
+   },
+   {
+    "from_sqm": 126.0,
+    "to_sqm": 200.0,
+    "fee_rs": 2000.0
+   },
+   {
+    "from_sqm": 201.0,
+    "to_sqm": 300.0,
+    "fee_rs": 3000.0
+   },
+   {
+    "from_sqm": 301.0,
+    "to_sqm": 400.0,
+    "fee_rs": 4000.0
+   },
+   {
+    "from_sqm": 401.0,
+    "to_sqm": 600.0,
+    "fee_rs": 6000.0
+   },
+   {
+    "from_sqm": 601.0,
+    "to_sqm": 750.0,
+    "fee_rs": 7500.0
+   },
+   {
+    "from_sqm": 751.0,
+    "to_sqm": 1000.0,
+    "fee_rs": 10000.0
+   },
+   {
+    "from_sqm": 1001.0,
+    "to_sqm": 1250.0,
+    "fee_rs": 12500.0
+   },
+   {
+    "from_sqm": 1251.0,
+    "to_sqm": 1500.0,
+    "fee_rs": 15000.0
+   },
+   {
+    "from_sqm": 1501.0,
+    "to_sqm": 2000.0,
+    "fee_rs": 20000.0
+   },
+   {
+    "from_sqm": 2001.0,
+    "to_sqm": 2500.0,
+    "fee_rs": 25000.0
+   },
+   {
+    "from_sqm": 2500.0,
+    "to_sqm": null,
+    "fee_rs": 50000.0,
+    "from_exclusive": true
+   }
+  ],
+  "notes": "Slabs are printed in whole sq.m. The last row is printed 'above 2500' (strictly more than 2500) with fee 50,000. Treatment of areas between printed slabs (e.g. 75.5) is a clerk decision, not in the rules.",
+  "verification": {
+   "by": "agent",
+   "method": "compared extracted rows with rendered PDF page image",
+   "date": "2026-10-11",
+   "independent_human_check": false
+  }
+ },
+ {
+  "id": "r21_3b_building_fee_other_items",
+  "rule": "21",
+  "title": "Rule 21(3)(b) items 2-9: other building types and charges",
+  "pages": [
+   36,
+   37
+  ],
+  "columns": [
+   "Item",
+   "Type of construction",
+   "Fee"
+  ],
+  "rows": [
+   [
+    "2.",
+    "A building intended to be used as shops, store house, factory or carrying on trade or business or any other commercial or industrial purpose.",
+    "Fees as prescribed in item No. 1 together with additional charge of 50% of such amount of fees."
+   ],
+   [
+    "3.",
+    "A building intended to be used as administrative block in a factory.",
+    "Fees as prescribed in item No. 1."
+   ],
+   [
+    "4.",
+    "A building intended to be used for shops cum residence purpose.",
+    "Fees as prescribed in item No. 1 together with an additional charge of 50% of such amount of fees."
+   ],
+   [
+    "5.",
+    "A building intended to be used as Cinema Theatres.",
+    "Upto 800 seating capacity Rs. 15,000.00 above 800 seating capacity Rs. 25,000.00"
+   ],
+   [
+    "6.",
+    "A building intended to be used for any Social, Charitable, culture, Educational purposes, Dharmshala and similar types of building and for any other purpose not specifically provided for.",
+    "Same as in item No. 1."
+   ],
+   [
+    "7.",
+    "Addition or alteration in built up area of external addition or alteration which does not add to the built up area such as courtyard, compound wall, alteration in elevation or roofing such as tiles to A.C. Sheet of flat surface, additional opening or closing not covered by proviso to sub-rule (1) of rule 12.",
+    "Rs. 500.00"
+   ],
+   [
+    "8.",
+    "In case of addition or alteration in the proposed plan",
+    "Up to 10% Rs. 500.00"
+   ],
+   [
+    "",
+    "",
+    "above 10% Fresh application according to the rule shall be necessary"
+   ],
+   [
+    "9.",
+    "Revalidation of the building permission",
+    "10% of the amount of permission fees charged originally in respect of the concerned building."
+   ]
+  ],
+  "verified": true,
+  "notes": "Item 8 prints two lines: 'Up to 10%' Rs. 500.00; 'above 10%' fresh application according to the rule shall be necessary.",
+  "verification": {
+   "by": "agent",
+   "method": "compared extracted rows with rendered PDF page image",
+   "date": "2026-10-11",
+   "independent_human_check": false
+  }
+ },
+ {
+  "id": "r21_3c_high_rise_fee",
+  "rule": "21",
+  "title": "Rule 21(3)(c): building permission fee, high rise buildings",
+  "pages": [
+   37
+  ],
+  "columns": [
+   "Item No.",
+   "Type of construction",
+   "Fees chargeable in rupees"
+  ],
+  "rows": [
+   [
+    "1.",
+    "A building intended to be used exclusively for residence.",
+    "Rs. 10.00 per square meter of the built up area."
+   ],
+   [
+    "2.",
+    "A building intended to be used as shops, storehouse, factory or for carrying on trade or business or any other commercial of industrial purpose.",
+    "Fees as prescribed in item No. 1 with additional charges of 100% of amount of fees."
+   ],
+   [
+    "3.",
+    "A building intended to be used as administrative block in a factory.",
+    "Fees as prescribed in item No. 1."
+   ],
+   [
+    "4.",
+    "A building intended to be used for shop-cum-residence purposes.",
+    "Fees as prescribed in item No. 1 together with additional charges of 50% of such amount of fees."
+   ],
+   [
+    "5.",
+    "A building intended to be used for any special, charitable/cultural, educational purpose including hospital, school, club, dharmashala and similar type of building and for any other purpose not specifically provided for.",
+    "Fees as prescribed in item No. 1."
+   ]
+  ],
+  "verified": true,
+  "verification": {
+   "by": "agent",
+   "method": "compared extracted rows with rendered PDF page image",
+   "date": "2026-10-11",
+   "independent_human_check": false
+  }
+ },
+ {
+  "id": "r52_distance_from_electric_lines",
+  "rule": "52",
+  "title": "Rule 52(1): minimum distance from overhead electric supply lines",
+  "pages": [
+   69
+  ],
+  "columns": [
+   "Particulars",
+   "Vertically meters",
+   "Horizontally meters"
+  ],
+  "rows": [
+   [
+    "Low and Medium voltage lines and service lines",
+    "2.5",
+    "1.2"
+   ],
+   [
+    "High voltage lines up to and including 33000 volts",
+    "3.7",
+    "1.2"
+   ],
+   [
+    "Extra high voltage lines beyond 33000 volts",
+    "(see note)",
+    ""
+   ]
+  ],
+  "verified": true,
+  "bands": [
+   {
+    "line": "Low and Medium voltage lines and service lines",
+    "vertical_m": 2.5,
+    "horizontal_m": 1.2
+   },
+   {
+    "line": "High voltage lines up to and including 33000 volts",
+    "vertical_m": 3.7,
+    "horizontal_m": 1.2
+   }
+  ],
+  "notes": "Extra high voltage beyond 33000 V: 'see note' - clear horizontal corridor of 15 m (7.5 m each side of centre line) or as per Electricity Rules, whichever is more.",
+  "verification": {
+   "by": "agent",
+   "method": "compared extracted rows with rendered PDF page image",
+   "date": "2026-10-11",
+   "independent_human_check": false
+  }
+ },
+ {
+  "id": "r42_table4",
+  "rule": "42",
+  "title": "Rule 42(1) Table 4: norms for buildings above 12.5 m and up to 30 m",
+  "pages": [
+   58
+  ],
+  "columns": [
+   "S. No.",
+   "Road Width in meters",
+   "Minimum plot/land (area in sq.m.)",
+   "Frontage in meters",
+   "FAR",
+   "1[Ground Coverage per- centage",
+   "Building Height in meters",
+   "Front M.O.S. in meters",
+   "Sides/ rear in MOS in meters"
+  ],
+  "rows": [
+   [
+    "1.",
+    "12.0 m. and above",
+    "1000 sq. m.",
+    "18 m.",
+    "1:1.50",
+    "-",
+    "Up to 18 meters",
+    "7.5",
+    "6.0"
+   ],
+   [
+    "2.",
+    "18 m. & above",
+    "1500 sq. m.",
+    "21 m.",
+    "1:1.75",
+    "-",
+    "Up to 24 meters",
+    "9.0",
+    "6.0"
+   ],
+   [
+    "3.",
+    "24 m. & above",
+    "2000 sq. m.",
+    "30 m.",
+    "1:2.0",
+    "-]",
+    "Up to 30 meters",
+    "12.00 m.",
+    "7.5 m."
+   ]
+  ],
+  "verified": true,
+  "notes": "Column 6 (ground coverage) and Note (1) were deleted by MP Rajpatra (Asadharan) No. 74 dated 06-03-2025; the PDF still shows '-' in that column.",
+  "verification": {
+   "by": "agent",
+   "method": "compared extracted rows with rendered PDF page image",
+   "date": "2026-10-11",
+   "independent_human_check": false
+  }
+ },
+ {
+  "id": "r42_table5",
+  "rule": "42",
+  "title": "Rule 42(2) Table 5: planning norms for high rise buildings",
+  "pages": [
+   59
+  ],
+  "columns": [
+   "S. No.",
+   "Road Width",
+   "Minimum plot/land size (area in sq.m.)",
+   "Frontage in meters",
+   "FAR",
+   "Ground Coverage per- centage",
+   "Building Height in meters",
+   "M.O.S. Front side in meters",
+   "MOS Sides/ rear"
+  ],
+  "rows": [
+   [
+    "1.",
+    "30 m. and above",
+    "2500",
+    "30 m.",
+    "1:2.25",
+    "30",
+    "Up to 45 meters",
+    "15.00 m.",
+    "7.5 m."
+   ],
+   [
+    "2.",
+    "36 m. and above",
+    "3000",
+    "40 m.",
+    "1:2.50",
+    "30",
+    "Up to 60 meters",
+    "18.00 m.",
+    "9.0 m."
+   ],
+   [
+    "3.",
+    "45 m. and above",
+    "3500",
+    "45 m.",
+    "1:2.75",
+    "30",
+    "Up to 75 meters",
+    "21 m.",
+    "9 m."
+   ],
+   [
+    "4.",
+    "60 m. and above",
+    "4000",
+    "50 m.",
+    "1:3.0",
+    "30",
+    "Up to 90 meters",
+    "24.00",
+    "10 m."
+   ],
+   [
+    "5.",
+    "75 m. and above",
+    "4500",
+    "60 m.",
+    "1:3.0",
+    "30",
+    "Above 90 meters",
+    "30.00",
+    "12 m."
+   ]
+  ],
+  "verified": true,
+  "notes": "Printed notes (inserted 06 March 2025): (1) commercial premises in planning areas may get max FAR 1:5.0 via TDR and Premium FAR for serial 4 and 5; (2) in commercial premises under Central Business District and Transit Oriented Development Corridor max FAR 1:7.0 for serial 5; (3) premium FAR rate decided by State Government.",
+  "verification": {
+   "by": "agent",
+   "method": "compared extracted rows with rendered PDF page image",
+   "date": "2026-10-11",
+   "independent_human_check": false
+  }
+ },
+ {
+  "id": "r42_it_ites_esdm",
+  "rule": "42",
+  "title": "Table 5-A: percentage of plots/FAR under MPIT, ITES and ESDM",
+  "pages": [
+   61
+  ],
+  "columns": [
+   "S. No.",
+   "Type of application",
+   "Type of Development",
+   "Plots used minimum IT/ITES/ESDM",
+   "Plots used maximum ancillary/commercial/other industry/residential"
+  ],
+  "rows": [
+   [
+    "1.",
+    "IT unit/ITES/Unit",
+    "Plotted Development",
+    "85%",
+    "15%"
+   ],
+   [
+    "",
+    "IT unit/ITES",
+    "Building Construction",
+    "60%",
+    "40%"
+   ],
+   [
+    "2.",
+    "ESDM Units",
+    "Plotted Development",
+    "85%",
+    "15%"
+   ],
+   [
+    "3.",
+    "Developers of an IT Investment Area",
+    "Building Construction",
+    "85%",
+    "15%"
+   ],
+   [
+    "",
+    "Developers of an IT Investment Area",
+    "Building Construction",
+    "60%",
+    "40%]"
+   ]
+  ],
+  "verified": true,
+  "verification": {
+   "by": "agent",
+   "method": "compared extracted rows with rendered PDF page image",
+   "date": "2026-10-11",
+   "independent_human_check": false
+  }
+ },
+ {
+  "id": "r53_plot_size_by_development_type",
+  "rule": "53",
+  "title": "Rule 53(1)(i): plot size and frontage by type of residential development",
+  "pages": [
+   70
+  ],
+  "columns": [
+   "Type of Development",
+   "Plot size (Sq. meters)",
+   "Frontage (meters)"
+  ],
+  "rows": [
+   [
+    "Detached building",
+    "above 225",
+    "above 12"
+   ],
+   [
+    "Semi-detached building",
+    "125-225",
+    "8 to 12"
+   ],
+   [
+    "Row type building",
+    "50-225",
+    "4.5 to 12"
+   ]
+  ],
+  "verified": true,
+  "verification": {
+   "by": "agent",
+   "method": "compared extracted rows with rendered PDF page image",
+   "date": "2026-10-11",
+   "independent_human_check": false
+  }
+ },
+ {
+  "id": "r53_cinema",
+  "rule": "53",
+  "title": "Rule 53(3)(ii): cinema halls with one screen",
+  "pages": [
+   70
+  ],
+  "columns": [
+   "Item",
+   "Norm"
+  ],
+  "rows": [
+   [
+    "1. Minimum area of the plot",
+    "- 2000 Square meter or 4 Sq. mt. per seat whichever is more"
+   ],
+   [
+    "2. Ground coverage",
+    "- 33 per cent. of the total plot area. (on ground)"
+   ],
+   [
+    "3. Floor Area Ratio",
+    "- 1.25"
+   ],
+   [
+    "4. Minimum Open Spaces",
+    "- Front - Minimum 15 mtrs. Both sides - 6 Mts. Rear - 6 Mts."
+   ],
+   [
+    "5. Minimum width of road on which Cinema Plot should abut",
+    "18 mtrs."
+   ]
+  ],
+  "verified": true,
+  "notes": "Printed note: commercial activities incidental to cinema are permissible on 10 per cent of the FAR.",
+  "verification": {
+   "by": "agent",
+   "method": "compared extracted rows with rendered PDF page image",
+   "date": "2026-10-11",
+   "independent_human_check": false
+  }
+ },
+ {
+  "id": "r53_marriage_garden",
+  "rule": "53",
+  "title": "Rule 53(3)(iii): marriage garden development norms",
+  "pages": [
+   71
+  ],
+  "columns": [
+   "S. No.",
+   "Components",
+   "Planning area having population 2.0 to 5.0 lacs",
+   "Planning area having population above 5.0 lacs"
+  ],
+  "rows": [
+   [
+    "1.",
+    "Minimum Plot / Land area",
+    "4000 Square meters",
+    "10000 Square meters"
+   ],
+   [
+    "2.",
+    "Minimum Road width in front",
+    "12 meters",
+    "18 meters"
+   ],
+   [
+    "3.",
+    "Minimum frontage",
+    "25 meters",
+    "40 meters"
+   ],
+   [
+    "4.",
+    "Maximum FAR",
+    "0.10",
+    "0.10"
+   ],
+   [
+    "5.",
+    "Maximum Ground Coverage",
+    "10 per cent.",
+    "10 per cent."
+   ],
+   [
+    "6.",
+    "Minimum Parking Area in the front",
+    "30 per cent. of plot / land area",
+    "40 per cent. of plot / land area"
+   ],
+   [
+    "7.",
+    "M.O.S. : Front",
+    "6.0 meters after parking space",
+    "6.0 meters after parking space"
+   ],
+   [
+    "8.",
+    "Permissibility in land use",
+    "Residential / Commercial / Agriculture / PSP",
+    "Residential / Commercial / Agriculture"
+   ]
+  ],
+  "verified": true,
+  "notes": "Fuel filling station table (53(3)(iv)(b), pages 71-72) and EV charging tables (pages 73-75) are NOT structured yet.",
+  "verification": {
+   "by": "agent",
+   "method": "compared extracted rows with rendered PDF page image",
+   "date": "2026-10-11",
+   "independent_human_check": false
+  }
+ }
+]

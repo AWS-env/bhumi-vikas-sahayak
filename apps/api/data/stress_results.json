@@ -1,0 +1,821 @@
+{
+ "english": [
+  {
+   "id": "E1",
+   "flag": "PASS",
+   "rank": 1,
+   "query": "What is the minimum side open space for a detached residential building?",
+   "top5": [
+    "56|rule|(3)",
+    "56|rule|(6)(a)",
+    "56|rule|(2)",
+    "table|r56_rear_open_space",
+    "56|rule|(1)"
+   ],
+   "top_rerank": 9.68
+  },
+  {
+   "id": "E2",
+   "flag": "PASS",
+   "rank": 1,
+   "query": "How wide must the road be to build a farm house?",
+   "top5": [
+    "17|rule|-",
+    "17-a|rule|-",
+    "table|r42_table4",
+    "42|rule|preamble",
+    "38|rule|(5)"
+   ],
+   "top_rerank": 4.56
+  },
+  {
+   "id": "E3",
+   "flag": "PASS",
+   "rank": 1,
+   "query": "How many live trees are needed on a farm house plot?",
+   "top5": [
+    "17|rule|-",
+    "67|rule|-",
+    "42-A|rule|(1)",
+    "17-a|rule|-",
+    "2|definition|(28) Farm House"
+   ],
+   "top_rerank": 6.05
+  },
+  {
+   "id": "E4",
+   "flag": "PASS",
+   "rank": 1,
+   "query": "What fee do I pay to build a 100 sq m shop?",
+   "top5": [
+    "21|rule|(3)(b) part 1",
+    "21|rule|(3)(c)",
+    "table|r21_3c_high_rise_fee",
+    "21|rule|(2)",
+    "table|r21_3b_building_fee_residential"
+   ],
+   "top_rerank": 1.03
+  },
+  {
+   "id": "E5",
+   "flag": "PASS",
+   "rank": 1,
+   "query": "How much plot area is needed to build a cinema hall with one screen?",
+   "top5": [
+    "table|r53_cinema",
+    "53|rule|(3)(i)-(ii)",
+    "95|rule|preamble",
+    "53|rule|(4)",
+    "2|definition|(44) multiplex"
+   ],
+   "top_rerank": 7.36
+  },
+  {
+   "id": "E6",
+   "flag": "PASS",
+   "rank": 1,
+   "query": "What is the fee to revalidate a building permission?",
+   "top5": [
+    "21|rule|(3)(b) part 3",
+    "21|rule|(2)",
+    "23|rule|-",
+    "14|rule|(3)(x)-(ii)",
+    "14|rule|(3)(b)-(c)"
+   ],
+   "top_rerank": 6.22
+  },
+  {
+   "id": "E7",
+   "flag": "PASS",
+   "rank": 1,
+   "query": "What size ventilation shaft is needed for a 20 m tall building?",
+   "top5": [
+    "56|rule|(6)(b)",
+    "table|r56_ventilation_shaft",
+    "56|rule|(6)(a)",
+    "73|rule|-",
+    "55|rule|-"
+   ],
+   "top_rerank": 3.91
+  },
+  {
+   "id": "E8",
+   "flag": "PASS",
+   "rank": 1,
+   "query": "What FAR and ground coverage apply to a high rise building on a 36 m wide road?",
+   "top5": [
+    "table|r42_table5",
+    "42|rule|(2) part 1",
+    "table|r42_table4",
+    "2|definition|(20) covered area or ground coverage",
+    "42|rule|preamble"
+   ],
+   "top_rerank": 3.6
+  },
+  {
+   "id": "E9",
+   "flag": "PASS",
+   "rank": 1,
+   "query": "What are the duties of an authorised architect?",
+   "top5": [
+    "26-B|rule|(7)",
+    "26-B|rule|(8)",
+    "26-B|rule|(1)",
+    "26-B|rule|(4)",
+    "26-B|rule|(10)"
+   ],
+   "top_rerank": 8.16
+  },
+  {
+   "id": "E10",
+   "flag": "PASS",
+   "rank": 1,
+   "query": "What happens if a building is constructed not according to the sanctioned plan?",
+   "top5": [
+    "10|rule|-",
+    "24|rule|-",
+    "33|rule|-",
+    "12-A|rule|part 2",
+    "2|definition|(61) sanctioned plan"
+   ],
+   "top_rerank": 8.03
+  },
+  {
+   "id": "E11",
+   "flag": "PASS",
+   "rank": 1,
+   "query": "Under what conditions can the authority revoke my building permission?",
+   "top5": [
+    "25|rule|-",
+    "26-B|rule|(10)",
+    "26-B|rule|(7)",
+    "26-B|rule|(9)",
+    "27|rule|-"
+   ],
+   "top_rerank": 7.22
+  },
+  {
+   "id": "E12",
+   "flag": "PASS",
+   "rank": 1,
+   "query": "How do I appeal if my building permission is refused?",
+   "top5": [
+    "29|rule|-",
+    "28|rule|-",
+    "27|rule|-",
+    "21|rule|(3)(d)",
+    "14|rule|(3)(vii)-(b)"
+   ],
+   "top_rerank": 2.27
+  },
+  {
+   "id": "E13",
+   "flag": "PASS",
+   "rank": 1,
+   "query": "What is the minimum height of a habitable room?",
+   "top5": [
+    "69|rule|preamble",
+    "69|rule|(2)",
+    "69|rule|(3)",
+    "72|rule|-",
+    "80|rule|(6)"
+   ],
+   "top_rerank": 8.38
+  },
+  {
+   "id": "E14",
+   "flag": "PASS",
+   "rank": 1,
+   "query": "What is the minimum width of a staircase?",
+   "top5": [
+    "80|rule|(2)",
+    "80|rule|(4)",
+    "80|rule|(3)",
+    "80|rule|(6)",
+    "80|rule|preamble"
+   ],
+   "top_rerank": 8.82
+  },
+  {
+   "id": "E15",
+   "flag": "PASS",
+   "rank": 1,
+   "query": "How many car parking spaces are needed for a residential building?",
+   "top5": [
+    "84|rule|-",
+    "95|rule|(4)(b)-(a)",
+    "95|rule|(5)",
+    "95|rule|(4)(b)-(c)",
+    "63|rule|-"
+   ],
+   "top_rerank": 0.69
+  },
+  {
+   "id": "E16",
+   "flag": "PASS",
+   "rank": 1,
+   "query": "What is the minimum plinth height?",
+   "top5": [
+    "68|rule|-",
+    "73|rule|-",
+    "76|rule|(2)",
+    "2|definition|(20) covered area or ground coverage",
+    "80|rule|(2)"
+   ],
+   "top_rerank": 4.06
+  },
+  {
+   "id": "E17",
+   "flag": "PASS",
+   "rank": 1,
+   "query": "What is the maximum height of a boundary wall?",
+   "top5": [
+    "78|rule|-",
+    "42|rule|(6)",
+    "77|rule|-",
+    "65|rule|-",
+    "58|rule|(4)"
+   ],
+   "top_rerank": 7.88
+  },
+  {
+   "id": "E18",
+   "flag": "PASS",
+   "rank": 1,
+   "query": "What is the definition of a high rise building?",
+   "top5": [
+    "2|definition|(38) high rise building",
+    "2|definition|(9) building height or height of a building",
+    "21|rule|(3)(c)",
+    "42|rule|(2) part 1",
+    "16|rule|(10)"
+   ],
+   "top_rerank": 9.09
+  },
+  {
+   "id": "E19",
+   "flag": "PASS",
+   "rank": 1,
+   "query": "When is a completion certificate required?",
+   "top5": [
+    "102|rule|-",
+    "83|rule|(2)",
+    "101|rule|-",
+    "67|rule|-",
+    "100|rule|-"
+   ],
+   "top_rerank": 4.79
+  },
+  {
+   "id": "E20",
+   "flag": "PASS",
+   "rank": 1,
+   "query": "What fire safety arrangements are required in a high rise building?",
+   "top5": [
+    "87|rule|(2)",
+    "16|rule|(6)(n)-(c)",
+    "86|rule|-",
+    "87|rule|(3)",
+    "16|rule|(6)(k)-(m)"
+   ],
+   "top_rerank": 5.2
+  },
+  {
+   "id": "E21",
+   "flag": "PASS",
+   "rank": 1,
+   "query": "Are basements allowed and what are the rules for them?",
+   "top5": [
+    "76|rule|(5)",
+    "76|rule|(2)",
+    "76|rule|(6)",
+    "76|rule|(3)",
+    "76|rule|preamble"
+   ],
+   "top_rerank": 7.03
+  },
+  {
+   "id": "E22",
+   "flag": "PASS",
+   "rank": 1,
+   "query": "What are the open space rules for a commercial building?",
+   "top5": [
+    "57|rule|-",
+    "56|rule|(5)",
+    "59|rule|-",
+    "56|rule|(7)",
+    "55|rule|-"
+   ],
+   "top_rerank": 6.06
+  },
+  {
+   "id": "E23",
+   "flag": "PASS",
+   "rank": 1,
+   "query": "How far must a building be from an extra high voltage line above 33000 volts?",
+   "top5": [
+    "52|rule|-",
+    "table|r52_distance_from_electric_lines",
+    "46|rule|-",
+    "42|rule|(2) part 2",
+    "table|r42_table5"
+   ],
+   "top_rerank": 6.85
+  },
+  {
+   "id": "E24",
+   "flag": "PASS",
+   "rank": 1,
+   "query": "What is the minimum plot size and frontage for a row house?",
+   "top5": [
+    "53|rule|preamble",
+    "table|r53_plot_size_by_development_type",
+    "56|rule|(3)",
+    "76|rule|(5)",
+    "53|rule|(3)(i)-(ii)"
+   ],
+   "top_rerank": 5.31
+  },
+  {
+   "id": "E25",
+   "flag": "PASS",
+   "rank": 2,
+   "query": "What is the fee for building permission for a cinema theatre?",
+   "top5": [
+    "94|rule|-",
+    "21|rule|(3)(b) part 2",
+    "21|rule|(2)",
+    "21|rule|(3)(b) part 3",
+    "table|r21_3c_high_rise_fee"
+   ],
+   "top_rerank": 3.04
+  },
+  {
+   "id": "E26",
+   "flag": "PASS",
+   "rank": 1,
+   "query": "Is a lift mandatory in a 14 m building?",
+   "top5": [
+    "83|rule|preamble",
+    "83|rule|(1)",
+    "42|rule|(5)",
+    "83|rule|(7)",
+    "83|rule|(6)"
+   ],
+   "top_rerank": 0.41
+  },
+  {
+   "id": "E27",
+   "flag": "PASS",
+   "rank": 1,
+   "query": "Can I build a mezzanine floor, and what are the limits?",
+   "top5": [
+    "73|rule|-",
+    "2|definition|(29) floor",
+    "2|definition|(43) mezzanine flood",
+    "2|definition|(30) Floor Area Ratio (FAR) part 1",
+    "2|definition|(30) Floor Area Ratio (FAR) part 2"
+   ],
+   "top_rerank": 3.31
+  },
+  {
+   "id": "E28",
+   "flag": "PASS",
+   "rank": 2,
+   "query": "What are the rules for a garage in my house?",
+   "top5": [
+    "56|rule|(4)",
+    "75|rule|-",
+    "2|definition|(56) private garage",
+    "2|definition|(57) public garage",
+    "58|rule|(4)"
+   ],
+   "top_rerank": 5.31
+  }
+ ],
+ "english_oos": [
+  {
+   "id": "O1",
+   "query": "Who is the current Chief Minister of Madhya Pradesh?",
+   "top_rerank": -5.32,
+   "top1": "1|rule|-"
+  },
+  {
+   "id": "O2",
+   "query": "What is the GST rate on cement?",
+   "top_rerank": -9.39,
+   "top1": "79|rule|(2)(g)-(h)"
+  },
+  {
+   "id": "O3",
+   "query": "Which are the best restaurants near MP Nagar in Bhopal?",
+   "top_rerank": -9.45,
+   "top1": "53|rule|(7)"
+  },
+  {
+   "id": "O4",
+   "query": "How do I get a driving licence in Bhopal?",
+   "top_rerank": -8.08,
+   "top1": "26|rule|(3)"
+  }
+ ],
+ "hindi_raw": [
+  {
+   "id": "H1",
+   "flag": "FAIL",
+   "rank": null,
+   "query": "मेरा घर 10 मीटर चौड़ी सड़क पर है, सामने कितनी जगह खाली छोड़नी होगी?",
+   "top5": [
+    "26-B|rule|(10)",
+    "16|rule|(4)(a)-(iii)",
+    "2|definition|(10) building line",
+    "16|rule|(10)",
+    "83|rule|(10)"
+   ],
+   "top_rerank": -7.12
+  },
+  {
+   "id": "H2",
+   "flag": "FAIL",
+   "rank": null,
+   "query": "फार्म हाउस के लिए न्यूनतम प्लॉट साइज़ और अधिकतम FAR क्या है?",
+   "top5": [
+    "61|rule|(2)",
+    "2|definition|(30) Floor Area Ratio (FAR) part 1",
+    "42|rule|(2) part 2",
+    "1|rule|-",
+    "61|rule|(5)"
+   ],
+   "top_rerank": -7.98
+  },
+  {
+   "id": "H3",
+   "flag": "FAIL",
+   "rank": null,
+   "query": "विकास अनुमति कितने साल मान्य रहती है और कितनी बार नवीनीकरण हो सकता है?",
+   "top5": [
+    "14|rule|(3)(i)-(vi)",
+    "16|rule|(11)(a)-(b)",
+    "16|rule|preamble",
+    "1|rule|-",
+    "25(A)|rule|-"
+   ],
+   "top_rerank": -6.92
+  },
+  {
+   "id": "H4",
+   "flag": "FAIL",
+   "rank": null,
+   "query": "बिल्डिंग परमिशन की फीस कितनी है और किस नियम में लिखी है?",
+   "top5": [
+    "16|rule|preamble",
+    "14|rule|(3)(i)-(vi)",
+    "22|rule|part 1",
+    "22|rule|part 3",
+    "16|rule|(11)(a)-(b)"
+   ],
+   "top_rerank": -7.76
+  },
+  {
+   "id": "H5",
+   "flag": "PASS",
+   "rank": 1,
+   "query": "150 वर्ग मीटर के आवासीय प्लॉट में पीछे कितनी खुली जगह चाहिए?",
+   "top5": [
+    "56|rule|(2)",
+    "table|r56_rear_open_space",
+    "16|rule|preamble",
+    "14|rule|(3)(i)-(vi)",
+    "16|rule|(11)(a)-(b)"
+   ],
+   "top_rerank": -8.43
+  },
+  {
+   "id": "H6",
+   "flag": "FAIL",
+   "rank": null,
+   "query": "बिजली की लाइन से बालकनी कितनी दूर होनी चाहिए?",
+   "top5": [
+    "16|rule|preamble",
+    "94|rule|-",
+    "22|rule|part 3",
+    "14|rule|(3)(i)-(vi)",
+    "16|rule|(11)(a)-(b)"
+   ],
+   "top_rerank": -7.57
+  },
+  {
+   "id": "H7",
+   "flag": "PASS",
+   "rank": 1,
+   "query": "भवन अनुमति के आवेदन के साथ कौन से दस्तावेज़ लगते हैं?",
+   "top5": [
+    "16|rule|preamble",
+    "16|rule|(11)(a)-(b)",
+    "14|rule|(3)(i)-(vi)",
+    "1|rule|-",
+    "25(A)|rule|-"
+   ],
+   "top_rerank": -7.83
+  },
+  {
+   "id": "H8",
+   "flag": "FAIL",
+   "rank": null,
+   "query": "मंज़ूर हो चुके नक्शे में बदलाव किया जा सकता है क्या?",
+   "top5": [
+    "16|rule|preamble",
+    "16|rule|(4)(a)-(iii)",
+    "16|rule|(11)(a)-(b)",
+    "1|rule|-",
+    "25(A)|rule|-"
+   ],
+   "top_rerank": -7.8
+  },
+  {
+   "id": "H9",
+   "flag": "FAIL",
+   "rank": null,
+   "query": "अगर प्राधिकरण समय पर जवाब न दे तो क्या होता है?",
+   "top5": [
+    "16|rule|preamble",
+    "14|rule|(3)(i)-(vi)",
+    "2|definition|(5) Authority having jurisdiction part 2",
+    "16|rule|(11)(a)-(b)",
+    "22|rule|part 3"
+   ],
+   "top_rerank": -7.55
+  },
+  {
+   "id": "H10",
+   "flag": "FAIL",
+   "rank": null,
+   "query": "12.5 मीटर से ऊँची इमारत में लिफ्ट के क्या नियम हैं?",
+   "top5": [
+    "56|rule|(5)",
+    "42|rule|(3)",
+    "42|rule|preamble",
+    "42|rule|(1)",
+    "56|rule|(1)"
+   ],
+   "top_rerank": -7.53
+  },
+  {
+   "id": "H11",
+   "flag": "PASS",
+   "rank": 3,
+   "query": "बहुमंजिला इमारत की परिभाषा क्या है?",
+   "top5": [
+    "16|rule|preamble",
+    "1|rule|-",
+    "2|definition|(2) Act",
+    "16|rule|(11)(a)-(b)",
+    "2|definition|(17) Code"
+   ],
+   "top_rerank": -7.79
+  },
+  {
+   "id": "H12",
+   "flag": "FAIL",
+   "rank": null,
+   "query": "भवन की चारदीवारी की अधिकतम ऊँचाई कितनी हो सकती है?",
+   "top5": [
+    "16|rule|preamble",
+    "14|rule|(3)(i)-(vi)",
+    "16|rule|(11)(a)-(b)",
+    "23|rule|-",
+    "22|rule|part 3"
+   ],
+   "top_rerank": -7.08
+  },
+  {
+   "id": "H13",
+   "flag": "FAIL",
+   "rank": null,
+   "query": "सीढ़ी की न्यूनतम चौड़ाई कितनी होनी चाहिए?",
+   "top5": [
+    "16|rule|preamble",
+    "2|definition|(17) Code",
+    "1|rule|-",
+    "25(A)|rule|-",
+    "16|rule|(11)(a)-(b)"
+   ],
+   "top_rerank": -8.08
+  }
+ ],
+ "translations": {
+  "H1": "How much open space must be left in front of my house on a 10-meter-wide road?",
+  "H2": "What is the minimum plot size and maximum FAR for a farmhouse?",
+  "H3": "How long is a development permission valid and how many times can it be renewed?",
+  "H4": "How much is the building permission fee and which rule specifies it?",
+  "H5": "How much rear open space is required for a 150 square meter residential plot?",
+  "H6": "How far should a balcony be from an electrical line?",
+  "H7": "What documents are required with a building permit application?",
+  "H8": "Can changes be made to an approved plan?",
+  "H9": "What happens if the authority does not respond on time?",
+  "H10": "What are the lift rules for buildings taller than 12.5 meters?",
+  "H11": "What is the definition of a multi-storey building?",
+  "H12": "What is the maximum height allowed for a building's boundary wall?",
+  "H13": "What is the minimum width of a staircase?",
+  "HO1": "How can I pay my property tax online?",
+  "HO2": "What is the current market price of land in Kolar Road, Bhopal?"
+ },
+ "hindi_translated": [
+  {
+   "id": "H1",
+   "flag": "PASS",
+   "rank": 1,
+   "query": "How much open space must be left in front of my house on a 10-meter-wide road?",
+   "top5": [
+    "56|rule|(3)",
+    "56|rule|(1)",
+    "56|rule|(2)",
+    "table|r56_front_open_space",
+    "57|rule|-"
+   ],
+   "top_rerank": 2.81
+  },
+  {
+   "id": "H2",
+   "flag": "PASS",
+   "rank": 1,
+   "query": "What is the minimum plot size and maximum FAR for a farmhouse?",
+   "top5": [
+    "17|rule|-",
+    "53|rule|(3)(iii)",
+    "53|rule|(3)(i)-(ii)",
+    "17-a|rule|-",
+    "76|rule|(5)"
+   ],
+   "top_rerank": 2.99
+  },
+  {
+   "id": "H3",
+   "flag": "PASS",
+   "rank": 1,
+   "query": "How long is a development permission valid and how many times can it be renewed?",
+   "top5": [
+    "23|rule|-",
+    "13|rule|-",
+    "26-B|rule|(1)",
+    "26|rule|(5)",
+    "28|rule|-"
+   ],
+   "top_rerank": 4.79
+  },
+  {
+   "id": "H4",
+   "flag": "FAIL",
+   "rank": 1,
+   "query": "How much is the building permission fee and which rule specifies it?",
+   "top5": [
+    "21|rule|(2)",
+    "21|rule|(3)(b) part 3",
+    "table|r21_3c_high_rise_fee",
+    "21|rule|(3)(b) part 1",
+    "21|rule|(3)(c)"
+   ],
+   "top_rerank": 5.62
+  },
+  {
+   "id": "H5",
+   "flag": "PASS",
+   "rank": 1,
+   "query": "How much rear open space is required for a 150 square meter residential plot?",
+   "top5": [
+    "56|rule|(2)",
+    "table|r56_rear_open_space",
+    "48|rule|(2) part 1",
+    "56|rule|(3)",
+    "56|rule|(1)"
+   ],
+   "top_rerank": 7.5
+  },
+  {
+   "id": "H6",
+   "flag": "PASS",
+   "rank": 1,
+   "query": "How far should a balcony be from an electrical line?",
+   "top5": [
+    "52|rule|-",
+    "table|r52_distance_from_electric_lines",
+    "77|rule|-",
+    "58|rule|preamble",
+    "46|rule|-"
+   ],
+   "top_rerank": 5.16
+  },
+  {
+   "id": "H7",
+   "flag": "PASS",
+   "rank": 2,
+   "query": "What documents are required with a building permit application?",
+   "top5": [
+    "31|rule|(2)(a)-(ii)",
+    "14|rule|(2)",
+    "32|rule|-",
+    "14|rule|preamble",
+    "16|rule|preamble"
+   ],
+   "top_rerank": 4.06
+  },
+  {
+   "id": "H8",
+   "flag": "FAIL",
+   "rank": null,
+   "query": "Can changes be made to an approved plan?",
+   "top5": [
+    "100|rule|-",
+    "14|rule|(3)(x)-(ii)",
+    "14|rule|(3)(c)",
+    "35|rule|(3)",
+    "49|rule|(4)"
+   ],
+   "top_rerank": 0.77
+  },
+  {
+   "id": "H9",
+   "flag": "PASS",
+   "rank": 3,
+   "query": "What happens if the authority does not respond on time?",
+   "top5": [
+    "31|rule|(2)(h)",
+    "83|rule|(8)",
+    "28|rule|-",
+    "10|rule|-",
+    "29|rule|-"
+   ],
+   "top_rerank": -3.65
+  },
+  {
+   "id": "H10",
+   "flag": "PASS",
+   "rank": 1,
+   "query": "What are the lift rules for buildings taller than 12.5 meters?",
+   "top5": [
+    "83|rule|preamble",
+    "56|rule|(5)",
+    "42|rule|(5)",
+    "42|rule|(1)",
+    "42|rule|(3)"
+   ],
+   "top_rerank": 7.16
+  },
+  {
+   "id": "H11",
+   "flag": "PASS",
+   "rank": 1,
+   "query": "What is the definition of a multi-storey building?",
+   "top5": [
+    "2|definition|(71) storey",
+    "2|definition|(44) multiplex",
+    "2|definition|(38) high rise building",
+    "2|definition|(29) floor",
+    "2|definition|(62) semi-detached building"
+   ],
+   "top_rerank": 2.9
+  },
+  {
+   "id": "H12",
+   "flag": "PASS",
+   "rank": 1,
+   "query": "What is the maximum height allowed for a building's boundary wall?",
+   "top5": [
+    "78|rule|-",
+    "42|rule|(6)",
+    "58|rule|(4)",
+    "65|rule|-",
+    "56|rule|(2)"
+   ],
+   "top_rerank": 7.55
+  },
+  {
+   "id": "H13",
+   "flag": "PASS",
+   "rank": 1,
+   "query": "What is the minimum width of a staircase?",
+   "top5": [
+    "80|rule|(2)",
+    "80|rule|(4)",
+    "80|rule|(3)",
+    "80|rule|(6)",
+    "80|rule|preamble"
+   ],
+   "top_rerank": 8.82
+  }
+ ],
+ "hindi_oos_translated": [
+  {
+   "id": "HO1",
+   "query": "How can I pay my property tax online?",
+   "top_rerank": -9.0,
+   "top1": "14|rule|(3)(x)-(ii)"
+  },
+  {
+   "id": "HO2",
+   "query": "What is the current market price of land in Kolar Road, Bhopal?",
+   "top_rerank": -9.86,
+   "top1": "table|r21_3a_permission_fee_development"
+  }
+ ]
+}
