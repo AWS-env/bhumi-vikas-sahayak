@@ -35,6 +35,21 @@ export async function signUp(_prev: AuthState, formData: FormData): Promise<Auth
   redirect("/chat");
 }
 
+// One-click demo: signs into a shared demo account, creating it on first use
+// (works because Supabase "Confirm email" is off).
+export async function demoLogin(): Promise<AuthState> {
+  const email = process.env.DEMO_EMAIL || "demo@bhumivikas.app";
+  const password = process.env.DEMO_PASSWORD || "demo-bhumi-vikas-2025";
+
+  const supabase = await createClient();
+  const first = await supabase.auth.signInWithPassword({ email, password });
+  if (!first.error) redirect("/chat");
+
+  const { data, error } = await supabase.auth.signUp({ email, password });
+  if (error || !data.session) return { error: "demo_failed" };
+  redirect("/chat");
+}
+
 export async function signOut() {
   const supabase = await createClient();
   await supabase.auth.signOut();
