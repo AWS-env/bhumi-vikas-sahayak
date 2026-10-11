@@ -2,7 +2,7 @@
 
 **Track 1: Bhumi Vikas Sahayak** · Claude Impact Lab × Cerebras Café Compute, Bhopal · 11 October 2026
 
-**Team:** TEAM NAME (fill in) · Members: MEMBER NAMES (fill in)
+**Team:** Clover · Members: Medhansh, Prakhar, Shrey, Shreyas
 
 A question-answering tool for the **MP Bhumi Vikas Rules, 2012**. A clerk asks in English, Hindi or Hinglish and gets a short answer in the same language, with the rule number, the exact rule text it came from, and the PDF page. When the rules are silent, the tool says so instead of guessing.
 
@@ -254,10 +254,10 @@ Run all of these from `apps/api` with `uv run python -X utf8 scripts/<name>`.
 
 ## Apple Watch app
 
-`watch/Sarthi/` is a SwiftUI watchOS app called "Bhopal Sahayak" that lets the user ask by voice without using a keyboard.
+`watch/Sarthi/` is a SwiftUI watchOS app called "Sarthi" that lets the user ask by voice without using a keyboard.
 
 <p align="center">
-  <img src="apps/web/public/Watch_face.png" alt="Bhopal Sahayak on Apple Watch: navy screen with a domed-pavilion mark, a cream mic button labelled &quot;Ask a rule&quot;, the transcribed question below it, and a Bhopal lakefront skyline along the bottom" width="260">
+  <img src="apps/web/public/Watch_face.png" alt="Sarthi on Apple Watch: navy screen with a domed-pavilion mark, a cream mic button labelled &quot;Ask a rule&quot;, the transcribed question below it, and a Bhopal lakefront skyline along the bottom" width="260">
 </p>
 
 **Flow**
