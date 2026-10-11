@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useLayoutEffect, useRef, useState } from "react";
 import gsap from "gsap";
 import Link from "next/link";
 import "./landing.css";
@@ -38,17 +38,15 @@ export default function Home() {
   const isPanelOpen = panel !== null;
   const place = destinations.find((item) => item.name === destination)!;
 
-  useEffect(() => {
+  useLayoutEffect(() => {
     const motion = gsap.matchMedia();
     motion.add("(prefers-reduced-motion: no-preference)", () => {
-      const intro = gsap.timeline({ defaults: { ease: "power3.out" } });
-      intro.from(".landscape", { scale: 1.08, duration: 2.6 })
-        .from(".header-reveal", { y: -18, opacity: 0, stagger: 0.09, duration: 1 }, 0.15)
-        .from(".title-letter", { yPercent: 105, rotate: 5, opacity: 0, stagger: 0.075, duration: 1.5 }, 0.25)
-        .from(".title-finial", { y: 20, opacity: 0, duration: 1 }, 0.95)
-        .from(".copy-reveal", { y: 20, opacity: 0, stagger: 0.14, duration: 1 }, 0.9)
-        .from(".menu-dock", { y: 35, opacity: 0, duration: 1 }, 1.2);
-      gsap.to(".landscape", { y: -8, duration: 8, repeat: -1, yoyo: true, ease: "sine.inOut", delay: 2.6 });
+      // Reveal complete groups once, with restrained movement and no looping.
+      const intro = gsap.timeline({ defaults: { ease: "sine.out" } });
+      intro.from(".site-header", { opacity: 0, duration: 0.65 }, 0)
+        .from(".hero-title", { y: 8, opacity: 0, duration: 0.95 }, 0.08)
+        .from(".hero-details", { y: 5, opacity: 0, duration: 0.75 }, 0.25)
+        .from(".menu-dock", { opacity: 0, duration: 0.65 }, 0.4);
     }, root);
     return () => motion.revert();
   }, []);
@@ -65,8 +63,7 @@ export default function Home() {
     const element = dialog.current;
     const context = gsap.context(() => {
       if (!window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
-        gsap.fromTo(element, { opacity: 0, y: 24, scale: 0.98 }, { opacity: 1, y: 0, scale: 1, duration: 0.45, ease: "power3.out" });
-        gsap.from(".panel-reveal", { opacity: 0, y: 16, stagger: 0.07, duration: 0.5, delay: 0.1 });
+        gsap.fromTo(element, { opacity: 0, y: 6 }, { opacity: 1, y: 0, duration: 0.3, ease: "sine.out" });
       }
     }, element);
     return () => context.revert();
@@ -88,7 +85,7 @@ export default function Home() {
         <nav className="main-nav" aria-label="Main navigation">
           {navigation.map((item) => <button key={item.panel} className="nav-link header-reveal" onClick={() => openPanel(item.panel)}>{item.label}</button>)}
         </nav>
-        <button className="get-started header-reveal" onClick={() => openPanel("start")}><span>Get Started</span><Arrow /></button>
+        <button className="get-started header-reveal" onClick={() => openPanel("start")}><span>Login</span><Arrow /></button>
       </header>
 
       <section className="hero-copy" id="main-content" aria-labelledby="hero-title">
