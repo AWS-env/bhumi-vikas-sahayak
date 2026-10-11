@@ -1,9 +1,12 @@
 import { Suspense } from "react";
+import { connection } from "next/server";
 import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import { signOut } from "@/app/login/actions";
+import ChatPanel from "@/components/ChatPanel";
 
 async function ChatShell() {
+  await connection(); // session check must run per request, never at prerender
   const supabase = await createClient();
   const {
     data: { user },
@@ -25,8 +28,8 @@ async function ChatShell() {
           </form>
         </div>
       </header>
-      <main className="flex flex-1 items-center justify-center p-8 text-zinc-500">
-        Chat coming soon.
+      <main className="min-h-0 flex-1">
+        <ChatPanel />
       </main>
     </>
   );
@@ -34,7 +37,7 @@ async function ChatShell() {
 
 export default function ChatPage() {
   return (
-    <div className="flex min-h-screen flex-col">
+    <div className="flex h-dvh flex-col">
       <Suspense fallback={<p className="p-6">Loading…</p>}>
         <ChatShell />
       </Suspense>
