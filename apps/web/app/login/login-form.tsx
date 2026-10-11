@@ -1,7 +1,7 @@
 "use client";
 
 import { useActionState, useState } from "react";
-import { signIn, signUp, type AuthState } from "./actions";
+import { demoLogin, signIn, signUp, type AuthState } from "./actions";
 
 type Lang = "en" | "hi";
 type Mode = "signin" | "signup";
@@ -17,7 +17,9 @@ const t = {
     toSignup: "New here? Create an account",
     toSignin: "Already have an account? Sign in",
     hint: "At least 8 characters",
+    demo: "Try demo (no sign-in needed)",
     errors: {
+      demo_failed: "Demo login is unavailable right now. Sign in with your account.",
       missing: "Enter email and password.",
       invalid: "Wrong email or password.",
       short: "Password must be at least 8 characters.",
@@ -37,7 +39,9 @@ const t = {
     toSignup: "नए हैं? खाता बनाएँ",
     toSignin: "पहले से खाता है? साइन इन करें",
     hint: "कम से कम 8 अक्षर",
+    demo: "डेमो आज़माएँ (साइन इन ज़रूरी नहीं)",
     errors: {
+      demo_failed: "डेमो लॉगिन अभी उपलब्ध नहीं है। अपने खाते से साइन इन करें।",
       missing: "ईमेल और पासवर्ड भरें।",
       invalid: "ईमेल या पासवर्ड गलत है।",
       short: "पासवर्ड कम से कम 8 अक्षर का होना चाहिए।",
@@ -56,8 +60,13 @@ export default function LoginForm() {
     mode === "signin" ? signIn : signUp,
     null,
   );
+  const [demoState, demoAction, demoPending] = useActionState<AuthState, FormData>(
+    async () => demoLogin(),
+    null,
+  );
   const s = t[lang];
-  const errorText = state?.error ? s.errors[state.error as keyof typeof s.errors] : null;
+  const error = state?.error ?? demoState?.error;
+  const errorText = error ? s.errors[error as keyof typeof s.errors] : null;
 
   return (
     <div className="w-full max-w-sm rounded-xl border border-black/[.08] bg-white p-8 shadow-sm dark:border-white/[.145] dark:bg-zinc-900">
@@ -113,10 +122,21 @@ export default function LoginForm() {
 
         <button
           type="submit"
-          disabled={pending}
+          disabled={pending || demoPending}
           className="h-11 rounded-md bg-black font-medium text-white disabled:opacity-60 dark:bg-white dark:text-black"
         >
           {mode === "signin" ? s.signin : s.signup}
+        </button>
+      </form>
+
+      <form action={demoAction} className="mt-3">
+        <button
+          type="submit"
+          disabled={pending || demoPending}
+          data-testid="demo-login"
+          className="h-11 w-full rounded-md border border-black/[.2] font-medium disabled:opacity-60 dark:border-white/[.25]"
+        >
+          {s.demo}
         </button>
       </form>
 
