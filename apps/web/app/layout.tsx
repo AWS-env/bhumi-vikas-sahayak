@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { Geist, Geist_Mono } from "next/font/google";
+import { Geist, Geist_Mono, Bodoni_Moda } from "next/font/google";
 import "./globals.css";
 
 const geistSans = Geist({
@@ -12,17 +12,24 @@ const geistMono = Geist_Mono({
   subsets: ["latin"],
 });
 
+const display = Bodoni_Moda({
+  variable: "--font-display",
+  subsets: ["latin"],
+  weight: ["400", "700"],
+  display: "swap",
+});
+
 export const metadata: Metadata = {
-  title: "Bhumi Vikas Sahayak",
+  title: "Sarthi — Building Rules. Clear Answers.",
   description:
-    "Ask the Bhopal building rulebook (MP Bhumi Vikas Rules, 2012) in English or Hindi.",
+    "Sarthi, Bhumi Vikas Sahayak for Bhopal. Explore MP building-rule topics, source versions, and guidance for questions in English or Hindi.",
 };
 
 export default function RootLayout({ children }: LayoutProps<"/">) {
   return (
     <html
       lang="en"
-      className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}
+      className={`${geistSans.variable} ${geistMono.variable} ${display.variable} h-full antialiased`}
     >
       <body className="min-h-full flex flex-col">{children}</body>
     </html>
