@@ -1,0 +1,9 @@
+{
+  "name": "api",
+  "private": true,
+  "version": "0.1.0",
+  "scripts": {
+    "dev": "uv run uvicorn app.main:app --reload --env-file .env",
+    "sync": "uv sync"
+  }
+}
