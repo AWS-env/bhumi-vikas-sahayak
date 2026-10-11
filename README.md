@@ -382,3 +382,8 @@ npm run lint    # turbo run lint
 - **`reference/`** is the official Track 1 data pack: rules as JSONL, full text by page, the English and Hindi PDFs, and sample questions, consolidated to 6 March 2025. Source: https://mptownplan.gov.in/NewsPDF/bvn06032025E.pdf. The English PDF is the source of truth. See [`reference/data/DATA_DICTIONARY.md`](reference/data/DATA_DICTIONARY.md).
 - Everything in `apps/api/data/` is derived from that pack by the scripts above.
 - No other data was added, no personal data is included, and no live government system was used.
+
+### whatsapp qr
+
+<img width="656" height="656" alt="whatsapp_hi_qr" src="https://github.com/user-attachments/assets/90be2a8c-9bca-4636-a0e7-ae7bc9614337" />
+
