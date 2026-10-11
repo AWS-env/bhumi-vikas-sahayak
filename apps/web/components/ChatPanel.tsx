@@ -1,91 +1,310 @@
 "use client";
 
-/* Chat look reused from the teammate's ChatPanel (blueprint blue + ivory).
-   UI only for now: no messages are sent and no API is called.
-   Keyboard: Enter submits (not wired yet), Shift+Enter inserts a new line. */
-
-import { useRef } from "react";
+import React, { useState, useRef, useEffect, useCallback } from "react";
 import MicButton from "./MicButton";
 
+const MAX_INPUT_HEIGHT_PX = 160; // about 6 lines, then the box scrolls
+const MAX_INPUT_CHARS = 2000;
+
+/* ------------------------------------------------------------------ */
+/*  Types (reused from ChatPanel)                                      */
+/* ------------------------------------------------------------------ */
+
+interface DisplayMessage {
+  id: string;
+  role: "user" | "bot";
+  text: string;
+}
+
+interface ChatHistoryItem {
+  role: "user" | "model";
+  text: string;
+}
+
+/* Palette matched to the reference etching — deep blueprint blue + ivory */
 const C = {
   panel: "bg-[#053581] paper-grain",
+  botBubble: "bg-[#14438A] text-[#F2E9D0] border border-[#F2E9D0]/20",
+  userBubble: "bg-[#F2E9D0] text-[#0A3982]",
   inputShell: "border-[#F2E9D0]/25 bg-[#14438A]",
   inputField: "bg-transparent text-[#F2E9D0] placeholder:text-[#F2E9D0]/50",
-  sendBtn: "bg-[#F2E9D0] text-[#0A3982]",
+  sendBtn: "bg-[#F2E9D0] text-[#0A3982] hover:bg-white",
   muted: "text-[#F2E9D0]/60",
+  faintLine: "border-[#F2E9D0]/15",
 } as const;
 
-const MAX_HEIGHT_PX = 160; // about 6 lines, then the box scrolls
-const MAX_CHARS = 2000;
+function SendIcon({ className }: { className?: string }) {
+  return (
+    <svg
+      width="17"
+      height="17"
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="2"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      className={className}
+      aria-hidden="true"
+    >
+      <path d="m22 2-7 20-4-9-9-4Z" />
+      <path d="M22 2 11 13" />
+    </svg>
+  );
+}
+
+function LoaderIcon({ className }: { className?: string }) {
+  return (
+    <svg
+      width="17"
+      height="17"
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="2"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      className={className}
+      aria-hidden="true"
+    >
+      <path d="M21 12a9 9 0 1 1-6.219-8.56" />
+    </svg>
+  );
+}
+
+/* ------------------------------------------------------------------ */
+/*  Component — prompting chat                                        */
+/* ------------------------------------------------------------------ */
 
 export default function ChatPanel() {
-  const boxRef = useRef<HTMLTextAreaElement>(null);
+  const [messages, setMessages] = useState<DisplayMessage[]>([]);
+  const [input, setInput] = useState("");
+  const [isLoading, setIsLoading] = useState(false);
 
-  function grow() {
-    const el = boxRef.current;
+  const scrollRef = useRef<HTMLDivElement>(null);
+  const inputRef = useRef<HTMLTextAreaElement>(null);
+  const historyRef = useRef<ChatHistoryItem[]>([]);
+  const idRef = useRef(0);
+
+  const nextId = useCallback(() => {
+    idRef.current += 1;
+    return `m${Date.now()}-${idRef.current}`;
+  }, []);
+
+  const scrollToBottom = useCallback(() => {
+    requestAnimationFrame(() => {
+      const el = scrollRef.current;
+      if (el) el.scrollTop = el.scrollHeight;
+    });
+  }, []);
+
+  useEffect(() => {
+    scrollToBottom();
+  }, [messages, isLoading, scrollToBottom]);
+
+  useEffect(() => {
+    inputRef.current?.focus();
+  }, []);
+
+  // Grow the question box with its text (up to ~6 lines); shrink back after sending.
+  useEffect(() => {
+    const el = inputRef.current;
     if (!el) return;
     el.style.height = "auto";
-    el.style.height = `${Math.min(el.scrollHeight, MAX_HEIGHT_PX)}px`;
-  }
+    el.style.height = `${Math.min(el.scrollHeight, MAX_INPUT_HEIGHT_PX)}px`;
+  }, [input]);
 
-  function addTranscript(text: string) {
-    const el = boxRef.current;
-    if (!el) return;
-    el.value = (el.value ? `${el.value} ` : "") + text;
-    grow();
-    el.focus();
-  }
+  const addBotMessage = useCallback(
+    (text: string) => {
+      setMessages((prev) => [...prev, { id: nextId(), role: "bot", text }]);
+      historyRef.current.push({ role: "model", text });
+      scrollToBottom();
+    },
+    [nextId, scrollToBottom]
+  );
 
-  function onKeyDown(e: React.KeyboardEvent<HTMLTextAreaElement>) {
+  const handleSend = useCallback(async () => {
+    const text = input.trim();
+    if (!text || isLoading) return;
+
+    setMessages((prev) => [...prev, { id: nextId(), role: "user", text }]);
+    historyRef.current.push({ role: "user", text });
+    setInput("");
+    setIsLoading(true);
+    scrollToBottom();
+
+    try {
+      const res = await fetch("/api/chat", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ messages: historyRef.current }),
+      });
+      const data = await res.json().catch(() => null);
+      if (!res.ok) {
+        throw new Error(
+          data?.error ??
+            (res.status === 404
+              ? "Chat backend API is not configured yet."
+              : "Request failed")
+        );
+      }
+      addBotMessage(data?.reply ?? "No reply received. Please try again.");
+    } catch (err) {
+      const msg = err instanceof Error ? err.message : "Something went wrong.";
+      addBotMessage(`⚠️ ${msg}`);
+    } finally {
+      setIsLoading(false);
+      inputRef.current?.focus();
+    }
+  }, [input, isLoading, nextId, scrollToBottom, addBotMessage]);
+
+  const handleKeyDown = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
     if (e.key !== "Enter") return;
     // Enter while composing Hindi (IME) confirms the word; it must not send.
     if (e.nativeEvent.isComposing) return;
-    if (e.shiftKey) return; // Shift+Enter: let the browser insert a new line
-    e.preventDefault(); // plain Enter: no new line; sending is wired in a later step
-  }
+    if (e.shiftKey) return; // Shift+Enter: the browser inserts a new line
+    e.preventDefault();
+    handleSend();
+  };
+
+  const isInitialView = messages.length === 0;
+
+  /* ---------- Messages content ---------- */
+  const messagesContent = (
+    <>
+      {messages.map((msg) => (
+        <div
+          key={msg.id}
+          className={`flex ${msg.role === "user" ? "justify-end" : "justify-start"}`}
+        >
+          <div
+            className={`max-w-[80%] rounded-2xl px-4 py-2 text-sm leading-relaxed whitespace-pre-wrap ${
+              msg.role === "user"
+                ? `rounded-br-sm ${C.userBubble}`
+                : `rounded-bl-sm ${C.botBubble}`
+            }`}
+          >
+            {renderMarkdown(msg.text)}
+          </div>
+        </div>
+      ))}
+      {isLoading && (
+        <div className="flex justify-start">
+          <div
+            className={`flex items-center gap-1 rounded-2xl rounded-bl-sm px-4 py-3 ${C.botBubble}`}
+          >
+            <span className="inline-block h-2 w-2 animate-bounce rounded-full bg-[#F2E9D0]/70 [animation-delay:0ms]" />
+            <span className="inline-block h-2 w-2 animate-bounce rounded-full bg-[#F2E9D0]/70 [animation-delay:150ms]" />
+            <span className="inline-block h-2 w-2 animate-bounce rounded-full bg-[#F2E9D0]/70 [animation-delay:300ms]" />
+          </div>
+        </div>
+      )}
+    </>
+  );
+
+  /* ---------- Input bar ---------- */
+  const inputBarContent = (
+    <div className="flex items-end gap-2">
+      <textarea
+        ref={inputRef}
+        rows={1}
+        maxLength={MAX_INPUT_CHARS}
+        value={input}
+        onChange={(e) => setInput(e.target.value)}
+        onKeyDown={handleKeyDown}
+        placeholder={
+          isInitialView
+            ? "Ask about the Bhumi Vikas Rules…  (Shift+Enter for a new line)"
+            : "Type your message…  (Shift+Enter for a new line)"
+        }
+        aria-label="Your question"
+        disabled={isLoading}
+        className={`flex-1 resize-none overflow-y-auto rounded-2xl border border-transparent px-4 py-2.5 text-sm leading-6 outline-none transition-colors focus:border-[#F2E9D0]/40 ${C.inputField}`}
+      />
+      <MicButton
+        onTranscript={(t) => setInput((prev) => (prev ? `${prev} ${t}` : t))}
+      />
+      <button
+        onClick={handleSend}
+        disabled={isLoading || !input.trim()}
+        className={`flex h-10 w-10 shrink-0 items-center justify-center rounded-full transition-all hover:shadow-md disabled:opacity-40 focus:outline-none focus:ring-2 focus:ring-[#F2E9D0]/50 ${C.sendBtn}`}
+        aria-label="Send message"
+      >
+        {isLoading ? <LoaderIcon className="animate-spin" /> : <SendIcon />}
+      </button>
+    </div>
+  );
 
   return (
     <div className={`flex h-full flex-col overflow-hidden ${C.panel}`}>
-      <div className="flex-grow-[1.5]" />
+      <div className="flex h-full flex-col">
+        {/* Top spacer for initial vertical centering */}
+        <div
+          className={`transition-[flex-grow] duration-700 ease-[cubic-bezier(0.25,1,0.5,1)] ${
+            isInitialView ? "flex-grow-[1.5]" : "flex-grow-0"
+          }`}
+        />
 
-      <div className="mx-auto mb-8 flex w-full max-w-3xl shrink-0 flex-col items-center gap-5 px-4">
-        <h1 className="text-center text-3xl font-semibold tracking-tight text-[#F2E9D0] sm:text-4xl">
-          Bhumi Vikas Sahayak
-        </h1>
-        <p className={`text-center text-sm ${C.muted}`}>
-          Ask about the MP Bhumi Vikas Rules, 2012 — in English, Hindi or Hinglish.
-        </p>
-      </div>
+        {/* Centered greeting */}
+        <div
+          className={`mx-auto flex w-full max-w-3xl shrink-0 origin-bottom transform flex-col items-center overflow-hidden px-4 transition-all duration-500 ease-in-out ${
+            isInitialView
+              ? "visible mb-8 max-h-[400px] scale-100 translate-y-0 gap-5 opacity-100"
+              : "invisible mb-0 max-h-0 scale-95 -translate-y-8 gap-0 opacity-0"
+          }`}
+        >
+          <h1 className="text-center text-3xl font-semibold tracking-tight text-[#F2E9D0] sm:text-4xl">
+            Bhumi Vikas Sahayak
+          </h1>
+          <p className={`text-center text-sm ${C.muted}`}>
+            Ask about the MP Bhumi Vikas Rules, 2012 — in English or Hindi.
+          </p>
+        </div>
 
-      <div className="flex-shrink-0 px-4 pb-5 pt-2">
-        <div className={`mx-auto max-w-3xl rounded-2xl border px-3 py-3 shadow-lg ${C.inputShell}`}>
-          <div className="flex items-end gap-2">
-            <textarea
-              ref={boxRef}
-              rows={1}
-              maxLength={MAX_CHARS}
-              onInput={grow}
-              onKeyDown={onKeyDown}
-              placeholder="Ask about the Bhumi Vikas Rules…  (Shift+Enter for a new line)"
-              aria-label="Your question"
-              className={`flex-1 resize-none overflow-y-auto rounded-2xl border border-transparent px-4 py-2.5 text-sm leading-6 outline-none transition-colors focus:border-[#F2E9D0]/40 ${C.inputField}`}
-            />
-            <MicButton onTranscript={addTranscript} />
-            <button
-              type="button"
-              aria-label="Send message"
-              className={`flex h-10 w-10 shrink-0 items-center justify-center rounded-full ${C.sendBtn}`}
-            >
-              <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
-                <path d="m22 2-7 20-4-9-9-4Z" />
-                <path d="M22 2 11 13" />
-              </svg>
-            </button>
+        {/* Messages area */}
+        <div
+          ref={scrollRef}
+          className={`min-h-0 w-full overflow-y-auto px-4 transition-all duration-700 ease-[cubic-bezier(0.25,1,0.5,1)] ${
+            isInitialView ? "flex-[0_1_0%] py-0 opacity-0" : "flex-[1_1_0%] py-3 opacity-100"
+          }`}
+          style={{ display: "flex", flexDirection: "column" }}
+        >
+          <div className="mx-auto flex min-h-full w-full max-w-3xl flex-col space-y-3">
+            <div className="min-h-0 flex-1" />
+            {messagesContent}
           </div>
         </div>
-      </div>
 
-      <div className="flex-grow-[1]" />
+        {/* Bottom input bar */}
+        <div className="relative z-20 flex-shrink-0 px-4 pb-5 pt-2">
+          <div
+            className={`mx-auto max-w-3xl rounded-2xl border px-3 py-3 shadow-lg ${C.inputShell}`}
+          >
+            {inputBarContent}
+          </div>
+        </div>
+
+        {/* Bottom spacer for initial vertical centering */}
+        <div
+          className={`transition-[flex-grow] duration-700 ease-[cubic-bezier(0.25,1,0.5,1)] ${
+            isInitialView ? "flex-grow-[1]" : "flex-grow-0"
+          }`}
+        />
+      </div>
     </div>
   );
+}
+
+/* ------------------------------------------------------------------ */
+/*  Very lightweight Markdown renderer (bold only)                     */
+/* ------------------------------------------------------------------ */
+
+function renderMarkdown(text: string) {
+  const parts = text.split(/(\*\*[^*]+\*\*)/g);
+  return parts.map((part, i) => {
+    if (part.startsWith("**") && part.endsWith("**")) {
+      return <strong key={i}>{part.slice(2, -2)}</strong>;
+    }
+    return <React.Fragment key={i}>{part}</React.Fragment>;
+  });
 }

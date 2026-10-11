@@ -8,6 +8,11 @@
       "outputs": [
         ".next/**",
         "!.next/cache/**"
+      ],
+      "env": [
+        "BACKEND_URL",
+        "BFF_SHARED_SECRET",
+        "WHATSAPP_*"
       ]
     },
     "lint": {}
