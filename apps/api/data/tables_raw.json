@@ -1,0 +1,1004 @@
+[
+ {
+  "rule": "56",
+  "page": 77,
+  "index": 0,
+  "rows": [
+   [
+    "S.No.",
+    "Width of street facing the plot",
+    "Front open space Min."
+   ],
+   [
+    "(1)",
+    "(2)",
+    "(3)"
+   ],
+   [
+    "1.",
+    "Up to 9.0 meters",
+    "3.0 meters"
+   ],
+   [
+    "2.",
+    "More than 9.0 meters and up to 12 meters",
+    "3.6 meters"
+   ],
+   [
+    "3.",
+    "More than 12.0 meters and up to 18 meters",
+    "4.5 meters"
+   ],
+   [
+    "4.",
+    "Above 18 meters",
+    "6.0 meters"
+   ]
+  ]
+ },
+ {
+  "rule": "56",
+  "page": 78,
+  "index": 0,
+  "rows": [
+   [
+    "S.No.",
+    "Plot area in Square meters",
+    "Minimum Rear Open space in meters"
+   ],
+   [
+    "(1)",
+    "(2)",
+    "(3)"
+   ],
+   [
+    "1.",
+    "Up to 40.00",
+    "Nil"
+   ],
+   [
+    "2.",
+    "Above 40.00 and up to 150.00",
+    "1.50"
+   ],
+   [
+    "3.",
+    "Above 150 and up to 225.00",
+    "2.50"
+   ],
+   [
+    "4.",
+    "Above 225.00",
+    "3.00"
+   ]
+  ]
+ },
+ {
+  "rule": "56",
+  "page": 79,
+  "index": 0,
+  "rows": [
+   [
+    "Height of buildings in meters",
+    "Size of ventilation shaft in square meters",
+    "Minimum size of a side of shaft in meters"
+   ],
+   [
+    "(1)",
+    "(2)",
+    "(3)"
+   ],
+   [
+    "Up to 10 12.5 18 24 30 above 30",
+    "1.2 2.8 4.0 5.4 8.0 9.0",
+    "0.9 1.2 1.5 1.8 2.4 3.0"
+   ]
+  ]
+ },
+ {
+  "rule": "21",
+  "page": 35,
+  "index": 0,
+  "rows": [
+   [
+    "Item",
+    "For development in following land use zones",
+    "Where population of the planning area is",
+    "",
+    ""
+   ],
+   [
+    "",
+    "",
+    "More than 10 lakhs",
+    "5 to 10 lakhs",
+    "Less than 5 lakhs"
+   ],
+   [
+    "(1)",
+    "(2)",
+    "(3)",
+    "(4)",
+    "(5)"
+   ],
+   [
+    "Permission fee payable (Rs./ Hectare)",
+    "Residential or Public and, semi Public or Industrial or Transportation",
+    "75,000",
+    "50,000",
+    "25,000"
+   ],
+   [
+    "",
+    "Commercial",
+    "1,50,000",
+    "1,25,000",
+    "1,00,000"
+   ],
+   [
+    "",
+    "Recreational or agriculture or other",
+    "30,000",
+    "20,000",
+    "10,000"
+   ]
+  ]
+ },
+ {
+  "rule": "21",
+  "page": 36,
+  "index": 0,
+  "rows": [
+   [
+    "Item No.",
+    "Type of construction",
+    "Built up area",
+    "",
+    "Fees Chargeable in Rs."
+   ],
+   [
+    "",
+    "",
+    "Sq.m.",
+    "To Sq.m.",
+    ""
+   ],
+   [
+    "(1)",
+    "(2)",
+    "(3)",
+    "(4)",
+    "(5)"
+   ],
+   [
+    "1.",
+    "A building intended to be used exclusively as residence",
+    "0",
+    "75",
+    "750"
+   ],
+   [
+    "",
+    "",
+    "76",
+    "125",
+    "1,250"
+   ],
+   [
+    "",
+    "",
+    "126",
+    "200",
+    "2,000"
+   ],
+   [
+    "",
+    "",
+    "201",
+    "300",
+    "3,000"
+   ],
+   [
+    "",
+    "",
+    "301",
+    "400",
+    "4,000"
+   ],
+   [
+    "",
+    "",
+    "401",
+    "600",
+    "6,000"
+   ],
+   [
+    "",
+    "",
+    "601",
+    "750",
+    "7,500"
+   ],
+   [
+    "",
+    "",
+    "751",
+    "1,000",
+    "10,000"
+   ],
+   [
+    "",
+    "",
+    "1,001",
+    "1,250",
+    "12,500"
+   ],
+   [
+    "",
+    "",
+    "1,251",
+    "1,500",
+    "15,000"
+   ],
+   [
+    "",
+    "",
+    "1,501",
+    "2,000",
+    "20,000"
+   ],
+   [
+    "",
+    "",
+    "2,001",
+    "2,500",
+    "25,000"
+   ],
+   [
+    "",
+    "",
+    "above 2500",
+    "",
+    "50,000"
+   ],
+   [
+    "2.",
+    "A building intended to be used as shops, store house, factory or carrying on trade or business or any other commercial or industrial purpose.",
+    "Fees as prescribed in item No. 1 together with additional charge of 50% of such amount of fees.",
+    "",
+    ""
+   ],
+   [
+    "3.",
+    "A building intended to be used as administrative block in a factory.",
+    "Fees as prescribed in item No. 1.",
+    "",
+    ""
+   ],
+   [
+    "4.",
+    "A building intended to be used for shops cum residence purpose.",
+    "Fees as prescribed in item No. 1 together with an additional charge of 50% of such amount of fees.",
+    "",
+    ""
+   ],
+   [
+    "5.",
+    "A building intended to be used as Cinema Theatres.",
+    "Upto 800 seating capacity Rs. 15,000.00 above 800 seating capacity Rs. 25,000.00",
+    "",
+    ""
+   ],
+   [
+    "6.",
+    "A building intended to be used for any Social, Charitable, culture, Educational purposes, Dharmshala and similar types of building and for any other purpose not specifically provided for.",
+    "Same as in item No. 1.",
+    "",
+    ""
+   ],
+   [
+    "7.",
+    "Addition or alteration in built up area of external addition or alteration which does not add to the built up area such as courtyard, compound wall, alteration in elevation or roofing such as tiles to A.C. Sheet of flat surface, additional opening or closing not covered by proviso to sub-rule (1) of rule 12.",
+    "Rs. 500.00",
+    "",
+    ""
+   ]
+  ]
+ },
+ {
+  "rule": "21",
+  "page": 37,
+  "index": 0,
+  "rows": [
+   [
+    "8.",
+    "In case of addition or alteration in the proposed plan",
+    "Up to 10% Rs. 500.00"
+   ],
+   [
+    "",
+    "",
+    "above 10% F r e s h a p p l ication according to the rule shall be necessary"
+   ],
+   [
+    "9.",
+    "Revalidation of the building permission",
+    "10% of the amount of permission fees charged originally in respect of the concerned building."
+   ]
+  ]
+ },
+ {
+  "rule": "21",
+  "page": 37,
+  "index": 1,
+  "rows": [
+   [
+    "Item No.",
+    "Type of construction",
+    "Fees chargeable in rupees"
+   ],
+   [
+    "(1)",
+    "(2)",
+    "(3)"
+   ],
+   [
+    "1.",
+    "A building intended to be used exclusively for residence.",
+    "Rs. 10.00 per square meter of the built up area."
+   ],
+   [
+    "2.",
+    "A building intended to be used as shops, storehouse, factory or for carrying on trade or business or any other commercial of industrial purpose.",
+    "Fees as prescribed in item No. 1 with additional charges of 100% of amount of fees."
+   ],
+   [
+    "3.",
+    "A building intended to be used as administrative block in a factory.",
+    "Fees as prescribed in item No. 1."
+   ],
+   [
+    "4.",
+    "A building intended to be used for shop-cum-residence purposes.",
+    "Fees as prescribed in item No. 1 together with additional charges of 50% of such amount of fees."
+   ],
+   [
+    "5.",
+    "A building intended to be used for any special, charitable/cultural, educational purpose including hospital, school, club, dharmashala and similar type of building and for any other purpose not specifically provided for.",
+    "Fees as prescribed in item No. 1."
+   ]
+  ]
+ },
+ {
+  "rule": "52",
+  "page": 69,
+  "index": 0,
+  "rows": [
+   [
+    "S.No.",
+    "Particulars",
+    "Vertically meters",
+    "Horizontally meters"
+   ],
+   [
+    "(1)",
+    "(2)",
+    "(3)",
+    "(4)"
+   ],
+   [
+    "(a)",
+    "Low and Medium voltage lines and service lines",
+    "2.5",
+    "1.2"
+   ],
+   [
+    "(b)",
+    "High voltage lines up to and including 33000 volts",
+    "3.7",
+    "1.2"
+   ],
+   [
+    "(c)",
+    "Extra high voltage lines beyond 33000 volts",
+    "(see note)",
+    ""
+   ]
+  ]
+ },
+ {
+  "rule": "52",
+  "page": 70,
+  "index": 0,
+  "rows": [
+   [
+    "Type of Development",
+    "Plot size (Sq. meters)",
+    "Frontage (meters)"
+   ],
+   [
+    "(1)",
+    "(2)",
+    "(3)"
+   ],
+   [
+    "Detached building",
+    "above 225",
+    "above 12"
+   ],
+   [
+    "Semi-detached building",
+    "125-225",
+    "8 to 12"
+   ],
+   [
+    "Row type building",
+    "50-225",
+    "4.5 to 12"
+   ]
+  ]
+ },
+ {
+  "rule": "52",
+  "page": 70,
+  "index": 1,
+  "rows": [
+   [
+    "1. Minimum area of the plot",
+    "- 2000 Square meter or 4 Sq. mt. per seat whichever is more"
+   ],
+   [
+    "2. Ground coverage",
+    "- 33 per cent. of the total plot area. (on ground)"
+   ],
+   [
+    "3. Floor Area Ratio",
+    "- 1.25"
+   ],
+   [
+    "4. Minimum Open Spaces",
+    "- Front - Minimum 15 mtrs. Both sides - 6 Mts. Rear - 6 Mts."
+   ],
+   [
+    "5. Minimum width of road on which Cinema Plot should abut",
+    "18 mtrs."
+   ]
+  ]
+ },
+ {
+  "rule": "42",
+  "page": 58,
+  "index": 0,
+  "rows": [
+   [
+    "S. No.",
+    "Road Width in meters",
+    "Minimum plot/land (area in sq.m.)",
+    "Frontage in meters",
+    "FAR",
+    "1[Ground Coverage per- centage",
+    "Building Height in meters",
+    "Front M.O.S. in meters",
+    "Sides/ rear in MOS in meters"
+   ],
+   [
+    "(1)",
+    "(2)",
+    "(3)",
+    "(4)",
+    "(5)",
+    "(6)",
+    "(7)",
+    "(8)",
+    "(9)"
+   ],
+   [
+    "1.",
+    "12.0 m. and above",
+    "1000 sq. m.",
+    "18 m.",
+    "1:1.50",
+    "-",
+    "Up to 18 meters",
+    "7.5",
+    "6.0"
+   ],
+   [
+    "2.",
+    "18 m. & above",
+    "1500 sq. m.",
+    "21 m.",
+    "1:1.75",
+    "-",
+    "Up to 24 meters",
+    "9.0",
+    "6.0"
+   ],
+   [
+    "3.",
+    "24 m. & above",
+    "2000 sq. m.",
+    "30 m.",
+    "1:2.0",
+    "-]",
+    "Up to 30 meters",
+    "12.00 m.",
+    "7.5 m."
+   ]
+  ]
+ },
+ {
+  "rule": "42",
+  "page": 59,
+  "index": 0,
+  "rows": [
+   [
+    "S. No.",
+    "Road Width",
+    "Minimum plot/land size (area in sq.m.)",
+    "Frontage in meters",
+    "FAR",
+    "Ground Coverage per- centage",
+    "Building Height in meters",
+    "M.O.S. Front side in meters",
+    "MOS Sides/ rear"
+   ],
+   [
+    "(1)",
+    "(2)",
+    "(3)",
+    "(4)",
+    "(5)",
+    "(6)",
+    "(7)",
+    "(8)",
+    "(9)"
+   ],
+   [
+    "1.",
+    "30 m. and above",
+    "2500",
+    "30 m.",
+    "1:2.25",
+    "30",
+    "Up to 45 meters",
+    "15.00 m.",
+    "7.5 m."
+   ],
+   [
+    "2.",
+    "36 m. and above",
+    "3000",
+    "40 m.",
+    "1:2.50",
+    "30",
+    "Up to 60 meters",
+    "18.00 m.",
+    "9.0 m."
+   ],
+   [
+    "3.",
+    "45 m. and above",
+    "3500",
+    "45 m.",
+    "1:2.75",
+    "30",
+    "Up to 75 meters",
+    "21 m.",
+    "9 m."
+   ],
+   [
+    "4.",
+    "60 m. and above",
+    "4000",
+    "50 m.",
+    "1:3.0",
+    "30",
+    "Up to 90 meters",
+    "24.00",
+    "10 m."
+   ],
+   [
+    "5.",
+    "75 m. and above",
+    "4500",
+    "60 m.",
+    "1:3.0",
+    "30",
+    "Above 90 meters",
+    "30.00",
+    "12 m."
+   ]
+  ]
+ },
+ {
+  "rule": "42",
+  "page": 61,
+  "index": 0,
+  "rows": [
+   [
+    "S. No.",
+    "Type of application",
+    "Type of Development",
+    "Percentage of Plots/F.A.R.",
+    ""
+   ],
+   [
+    "",
+    "",
+    "",
+    "Plots used Minimum IT/ ITES/ESDM",
+    "Plots used Maximum Ancillary/ Commercial other Industry/ Residential"
+   ],
+   [
+    "1.",
+    "IT unit/ITES/Unit",
+    "Plotted Development",
+    "85%",
+    "15%"
+   ],
+   [
+    "",
+    "IT unit/ITES",
+    "Building Construction",
+    "60%",
+    "40%"
+   ],
+   [
+    "2.",
+    "ESDM Units",
+    "Plotted Development",
+    "85%",
+    "15%"
+   ],
+   [
+    "3.",
+    "Developers of an IT Investment Area",
+    "Building Construction",
+    "85%",
+    "15%"
+   ],
+   [
+    "",
+    "Developers of an IT Investment Area",
+    "Building Construction",
+    "60%",
+    "40%]"
+   ]
+  ]
+ },
+ {
+  "rule": "53",
+  "page": 70,
+  "index": 0,
+  "rows": [
+   [
+    "Type of Development",
+    "Plot size (Sq. meters)",
+    "Frontage (meters)"
+   ],
+   [
+    "(1)",
+    "(2)",
+    "(3)"
+   ],
+   [
+    "Detached building",
+    "above 225",
+    "above 12"
+   ],
+   [
+    "Semi-detached building",
+    "125-225",
+    "8 to 12"
+   ],
+   [
+    "Row type building",
+    "50-225",
+    "4.5 to 12"
+   ]
+  ]
+ },
+ {
+  "rule": "53",
+  "page": 70,
+  "index": 1,
+  "rows": [
+   [
+    "1. Minimum area of the plot",
+    "- 2000 Square meter or 4 Sq. mt. per seat whichever is more"
+   ],
+   [
+    "2. Ground coverage",
+    "- 33 per cent. of the total plot area. (on ground)"
+   ],
+   [
+    "3. Floor Area Ratio",
+    "- 1.25"
+   ],
+   [
+    "4. Minimum Open Spaces",
+    "- Front - Minimum 15 mtrs. Both sides - 6 Mts. Rear - 6 Mts."
+   ],
+   [
+    "5. Minimum width of road on which Cinema Plot should abut",
+    "18 mtrs."
+   ]
+  ]
+ },
+ {
+  "rule": "53",
+  "page": 71,
+  "index": 0,
+  "rows": [
+   [
+    "S. No.",
+    "Components",
+    "Planning area having population 2.0 to 5.0 lacs",
+    "Planning area having population above 5.0 lacs"
+   ],
+   [
+    "(1)",
+    "(2)",
+    "(3)",
+    "(4)"
+   ],
+   [
+    "1.",
+    "Minimum Plot / Land area",
+    "4000 Square meters",
+    "10000 Square meters"
+   ],
+   [
+    "2.",
+    "Minimum Road width in front",
+    "12 meters",
+    "18 meters"
+   ],
+   [
+    "3.",
+    "Minimum frontage",
+    "25 meters",
+    "40 meters"
+   ],
+   [
+    "4.",
+    "Maximum FAR",
+    "0.10",
+    "0.10"
+   ],
+   [
+    "5.",
+    "Maximum Ground Coverage",
+    "10 per cent.",
+    "10 per cent."
+   ],
+   [
+    "6.",
+    "Minimum Parking Area in the front",
+    "30 per cent. of plot / land area",
+    "40 per cent. of plot / land area"
+   ],
+   [
+    "7.",
+    "M.O.S. : Front",
+    "6.0 meters after parking space",
+    "6.0 meters after parking space"
+   ],
+   [
+    "8.",
+    "Permissibility in land use",
+    "Residential / Commercial / Agriculture / PSP",
+    "Residential / Commercial / Agriculture"
+   ]
+  ]
+ },
+ {
+  "rule": "53",
+  "page": 71,
+  "index": 1,
+  "rows": [
+   [
+    "S. No.",
+    "Population",
+    "Minimum Plot Size (in meters)",
+    "",
+    "Frontage of the plot (in meters)",
+    "Minimum road width in front of the plot (in meters)",
+    "Permissibility in land used of approved development land"
+   ],
+   [
+    "",
+    "",
+    "Only Fuel Filling Station (FFS)",
+    "Fuel Filling Station with Service Facilities (FFSS)",
+    "",
+    "",
+    ""
+   ],
+   [
+    "(1)",
+    "(2)",
+    "(3)",
+    "(4)",
+    "(5)",
+    "(6)",
+    "(7)"
+   ],
+   [
+    "1.",
+    "Less than 0.5 lac",
+    "20×20",
+    "35×35",
+    "20 (FFS) 35 (FFSS)",
+    "15",
+    "Residential, Mixed, Commercial, Industrial,"
+   ]
+  ]
+ },
+ {
+  "rule": "53",
+  "page": 72,
+  "index": 0,
+  "rows": [
+   [
+    "2.",
+    "0.5 lac to 5 lac",
+    "20×20",
+    "35×35",
+    "20 (FFS) 35 (FFSS)",
+    "18",
+    "Public and semi- Public, Transportation, Agriculture and Recreational. Agriculture and Recreational"
+   ],
+   [
+    "3.",
+    "Above 5 lac",
+    "20×20",
+    "35×35",
+    "20 (FFS) 35 (FFSS)",
+    "24",
+    ""
+   ]
+  ]
+ },
+ {
+  "rule": "53",
+  "page": 73,
+  "index": 0,
+  "rows": [
+   [
+    "S.N.",
+    "Categor y",
+    "Permitted in",
+    "Land Requirement",
+    "",
+    "Other Control"
+   ],
+   [
+    "",
+    "",
+    "",
+    "Type of facility",
+    "Area requirement",
+    ""
+   ],
+   [
+    "1",
+    "2",
+    "3",
+    "4",
+    "5",
+    "6"
+   ],
+   [
+    "1",
+    "Electric Vehicle (EV) Chargi ng and service centre",
+    "Permitted in: 1. Central District 2. Sub district central 3. District Centres 4. Community Centres (Only Filling Station) 5. Residential & industrial use Zone In urban Areas. 6. Along National & Highways State 7. Villages identified as growth centres. 8. Freight Complex 9. Proposed major roads. 10.Police/Secu rity forces services (for captive use only)",
+    " Public Charging Station (PCS)  (Minimum requirement as per MoP Guidelines)",
+    "Min 13.5m X 5.5 m",
+    "1. Shall not be located on road having Right of way less than 30 m. 2. Special cases in old city areas may. be considered based on the approval by statutory authorities. 3. Shall be approved by the explosives/fir e department. 4. Charging Station and all equipment layout with respect nearest dispensing unit (DU)/fuel tank to be as per PESO rules. to 5. Equipped with Climate Control Equipment (CCE) and Liquid Cooled Cables (LCC) as required in addition to requirements of Public Charging Station (PCs). 6. Optional addition to PCs by the Service Provider (SP)."
+   ],
+   [
+    "",
+    "",
+    "",
+    "Fluid Cooled battery Charging Station (FCB CS) 1 Combined Charging System (CCS) 1 CHAdeMO (ADC fast charging standard)",
+    "Min 15m X 7 m",
+    ""
+   ],
+   [
+    "",
+    "",
+    "",
+    "Battery swapping station (optional)",
+    "Earmarking area for \"Battery fitting\"",
+    ""
+   ]
+  ]
+ },
+ {
+  "rule": "53",
+  "page": 74,
+  "index": 0,
+  "rows": [
+   [
+    "2",
+    "Compr e ssed Natural Gas (CNG) filling centre",
+    "1. Permitted in All use(except zones in Regional Parks Developed District Parks) 2. Along National and Highways 3. Villages identified as growth centres 4. Freight Complex 5. Proposed major roads",
+    "CNG mother station (Including building component –control room/office /dispensing and room/store, pantry and WC.)",
+    "1080 sqm (36m x 30m",
+    "1. Shall not be located on road having Right of Way less 30m. than 2. Shall be approved by the explosive/fire department"
+   ]
+  ]
+ },
+ {
+  "rule": "53",
+  "page": 74,
+  "index": 1,
+  "rows": [
+   [
+    "S. No",
+    "Category",
+    "Population served per unit",
+    "Land Requirement",
+    "",
+    "Other Control"
+   ],
+   [
+    "",
+    "",
+    "",
+    "Type of facility",
+    "Area requirement",
+    ""
+   ],
+   [
+    "1",
+    "2",
+    "3",
+    "4",
+    "5",
+    "6"
+   ],
+   [
+    "A",
+    "Public Charging Stations",
+    "Every 25 Kms, both Sides along the highways /roads",
+    "Public Charging Station (PCS) with charger ratio (minimum requirements of PCS, as per MoP)  1 Fast Charger (FC) fol every iC EVs  1Siow Charger (SC) for every 3 EVs",
+    "Additional area as per total parking capacity at the Restaurants/ Eateries.",
+    "Equipped with Climate Control Equipment (CCE) and Liquid Cooled Cables (LCC), as may be required fast charging"
+   ]
+  ]
+ },
+ {
+  "rule": "53",
+  "page": 75,
+  "index": 0,
+  "rows": [
+   [
+    "B",
+    "Fast Charging facility / Fluid Cooled battery Charging Station (FCB CS) (for Long, Distance & Heavy Duty EVs)",
+    "Every 100 Kms, both Sides along the highways/ roads",
+    "At least 2 chargers  1 CCC type  1 CHAdeM O type (min 100KW each)",
+    "Min.15m x 7m",
+    "May be coupled with PCS a item A above with CCE and LCC."
+   ],
+   [
+    "C",
+    "Battery Swapping Station",
+    "Optional provisions as per MoP Guidelines.",
+    "Standalone",
+    "Min 5.5m x 2.75m",
+    "May be coupled with PCS at item A or FCB CS at item B above"
+   ],
+   [
+    "",
+    "",
+    "",
+    "Provided along with FBC charging Stations",
+    "",
+    ""
+   ]
+  ]
+ }
+]

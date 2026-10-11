@@ -1,0 +1,58 @@
+{
+  "note": "Harder and more varied questions than the 17 samples. Expected rules chosen by reading rule titles/text; a FAIL needs a human look because the target itself could be debatable.",
+  "english": [
+    {"id": "E1", "q": "What is the minimum side open space for a detached residential building?", "rules": ["56"]},
+    {"id": "E2", "q": "How wide must the road be to build a farm house?", "rules": ["17"]},
+    {"id": "E3", "q": "How many live trees are needed on a farm house plot?", "rules": ["17"]},
+    {"id": "E4", "q": "What fee do I pay to build a 100 sq m shop?", "rules": ["21"], "must_chunks": ["table|r21_3b"]},
+    {"id": "E5", "q": "How much plot area is needed to build a cinema hall with one screen?", "rules": ["53"], "must_chunks": ["table|r53_cinema"]},
+    {"id": "E6", "q": "What is the fee to revalidate a building permission?", "rules": ["21", "23"]},
+    {"id": "E7", "q": "What size ventilation shaft is needed for a 20 m tall building?", "rules": ["56"], "must_chunks": ["table|r56_ventilation_shaft"]},
+    {"id": "E8", "q": "What FAR and ground coverage apply to a high rise building on a 36 m wide road?", "rules": ["42"], "must_chunks": ["table|r42_table5"]},
+    {"id": "E9", "q": "What are the duties of an authorised architect?", "rules": ["26-B", "26"]},
+    {"id": "E10", "q": "What happens if a building is constructed not according to the sanctioned plan?", "rules": ["10", "24", "34"]},
+    {"id": "E11", "q": "Under what conditions can the authority revoke my building permission?", "rules": ["25"]},
+    {"id": "E12", "q": "How do I appeal if my building permission is refused?", "rules": ["25(A)", "29", "30", "27"]},
+    {"id": "E13", "q": "What is the minimum height of a habitable room?", "rules": ["69"]},
+    {"id": "E14", "q": "What is the minimum width of a staircase?", "rules": ["80"]},
+    {"id": "E15", "q": "How many car parking spaces are needed for a residential building?", "rules": ["84"]},
+    {"id": "E16", "q": "What is the minimum plinth height?", "rules": ["68"]},
+    {"id": "E17", "q": "What is the maximum height of a boundary wall?", "rules": ["78"]},
+    {"id": "E18", "q": "What is the definition of a high rise building?", "rules": ["2"]},
+    {"id": "E19", "q": "When is a completion certificate required?", "rules": ["102"]},
+    {"id": "E20", "q": "What fire safety arrangements are required in a high rise building?", "rules": ["87", "86"]},
+    {"id": "E21", "q": "Are basements allowed and what are the rules for them?", "rules": ["76"]},
+    {"id": "E22", "q": "What are the open space rules for a commercial building?", "rules": ["57"]},
+    {"id": "E23", "q": "How far must a building be from an extra high voltage line above 33000 volts?", "rules": ["52"], "must_chunks": ["table|r52_distance_from_electric_lines"]},
+    {"id": "E24", "q": "What is the minimum plot size and frontage for a row house?", "rules": ["53"], "must_chunks": ["table|r53_plot_size_by_development_type"]},
+    {"id": "E25", "q": "What is the fee for building permission for a cinema theatre?", "rules": ["21"]},
+    {"id": "E26", "q": "Is a lift mandatory in a 14 m building?", "rules": ["83"]},
+    {"id": "E27", "q": "Can I build a mezzanine floor, and what are the limits?", "rules": ["73"]},
+    {"id": "E28", "q": "What are the rules for a garage in my house?", "rules": ["75"]}
+  ],
+  "english_out_of_scope": [
+    {"id": "O1", "q": "Who is the current Chief Minister of Madhya Pradesh?"},
+    {"id": "O2", "q": "What is the GST rate on cement?"},
+    {"id": "O3", "q": "Which are the best restaurants near MP Nagar in Bhopal?"},
+    {"id": "O4", "q": "How do I get a driving licence in Bhopal?"}
+  ],
+  "hindi": [
+    {"id": "H1", "q": "मेरा घर 10 मीटर चौड़ी सड़क पर है, सामने कितनी जगह खाली छोड़नी होगी?", "rules": ["56"], "must_chunks": ["table|r56_front_open_space"]},
+    {"id": "H2", "q": "फार्म हाउस के लिए न्यूनतम प्लॉट साइज़ और अधिकतम FAR क्या है?", "rules": ["17"]},
+    {"id": "H3", "q": "विकास अनुमति कितने साल मान्य रहती है और कितनी बार नवीनीकरण हो सकता है?", "rules": ["23"]},
+    {"id": "H4", "q": "बिल्डिंग परमिशन की फीस कितनी है और किस नियम में लिखी है?", "rules": ["21"], "must_chunks": ["table|r21_3b_building_fee_residential"]},
+    {"id": "H5", "q": "150 वर्ग मीटर के आवासीय प्लॉट में पीछे कितनी खुली जगह चाहिए?", "rules": ["56"], "must_chunks": ["table|r56_rear_open_space"]},
+    {"id": "H6", "q": "बिजली की लाइन से बालकनी कितनी दूर होनी चाहिए?", "rules": ["52"]},
+    {"id": "H7", "q": "भवन अनुमति के आवेदन के साथ कौन से दस्तावेज़ लगते हैं?", "rules": ["14", "16"]},
+    {"id": "H8", "q": "मंज़ूर हो चुके नक्शे में बदलाव किया जा सकता है क्या?", "rules": ["24", "19"]},
+    {"id": "H9", "q": "अगर प्राधिकरण समय पर जवाब न दे तो क्या होता है?", "rules": ["28", "27"]},
+    {"id": "H10", "q": "12.5 मीटर से ऊँची इमारत में लिफ्ट के क्या नियम हैं?", "rules": ["83"]},
+    {"id": "H11", "q": "बहुमंजिला इमारत की परिभाषा क्या है?", "rules": ["2"]},
+    {"id": "H12", "q": "भवन की चारदीवारी की अधिकतम ऊँचाई कितनी हो सकती है?", "rules": ["78"]},
+    {"id": "H13", "q": "सीढ़ी की न्यूनतम चौड़ाई कितनी होनी चाहिए?", "rules": ["80"]}
+  ],
+  "hindi_out_of_scope": [
+    {"id": "HO1", "q": "मैं अपनी संपत्ति का टैक्स ऑनलाइन कैसे भरूँ?"},
+    {"id": "HO2", "q": "कोलार रोड भोपाल में ज़मीन का मौजूदा बाज़ार भाव क्या है?"}
+  ]
+}

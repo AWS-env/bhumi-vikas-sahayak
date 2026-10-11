@@ -1,0 +1,22 @@
+{
+  "note": "Expected rules per sample question, derived by reading the rules (answers are not given in the data pack). Hindi questions use a hand-made English version, standing in for the translation step. must_chunks are chunk-id prefixes that must appear for table-number questions.",
+  "questions": [
+    {"n": 1, "q": "My house faces a 10 m wide street and will be 9 m tall. How much open space do I leave at the front?", "rules": ["56"], "must_chunks": ["table|r56_front_open_space"]},
+    {"n": 2, "q": "I want a farm house on agricultural land. What is the minimum plot size and the maximum FAR?", "rules": ["17"]},
+    {"n": 3, "q": "My development permission was granted in 2023. How long does it stay valid, and how many times can I renew it?", "rules": ["23"]},
+    {"n": 4, "q": "I applied for building permission and the authority has not replied. What happens if they miss the deadline?", "rules": ["28", "27"]},
+    {"n": 5, "q": "How far must my balcony stay from a low-voltage overhead electric line, vertically and horizontally?", "rules": ["52"], "must_chunks": ["table|r52_distance_from_electric_lines"]},
+    {"n": 6, "q": "Who is allowed to sign and submit my building plans?", "rules": ["18", "26"]},
+    {"n": 7, "q": "What documents go with an application for building permission?", "rules": ["14", "16"]},
+    {"n": 8, "q": "What is the fee for building permission for a residential house?", "rules": ["21"], "must_chunks": ["table|r21_3b_building_fee_residential"]},
+    {"n": 9, "q": "Can I change my plan after it is sanctioned?", "rules": ["24", "19"]},
+    {"n": 10, "q": "What is the minimum rear open space for a 150 sq m residential plot?", "rules": ["56"], "must_chunks": ["table|r56_rear_open_space"]},
+    {"n": 11, "q": "Do I need separate development permission for a 300 sq m plot that matches the Development Plan?", "rules": ["12", "12-A"], "chunk_prefix": ["2|definition|(5)"], "note": "Aug 2026 amendment to Rule 2(5)(c) is not in the data."},
+    {"n": 12, "q": "Which rule decides what happens when the Development Plan and these rules disagree?", "rules": ["103"]},
+    {"n": 13, "q": "What are the rules for lifts in a building taller than 15 m?", "rules": ["83"]},
+    {"n": 14, "q": "My plot is 200 sq m and the road in front is 9 m wide. How much space must I leave at the front?", "rules": ["56"], "must_chunks": ["table|r56_front_open_space"], "original_lang": "hi"},
+    {"n": 15, "q": "What is the building permission fee and which rule states it?", "rules": ["21"], "must_chunks": ["table|r21_3b_building_fee_residential"], "original_lang": "hi"},
+    {"n": 16, "q": "How do I pay my property tax online?", "out_of_scope": true},
+    {"n": 17, "q": "What is the current market rate for land in Kolar Road, Bhopal?", "out_of_scope": true}
+  ]
+}

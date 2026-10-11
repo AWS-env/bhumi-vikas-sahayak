@@ -1,6 +1,10 @@
 "use client";
 
 import React, { useState, useRef, useEffect, useCallback } from "react";
+import MicButton from "./MicButton";
+
+const MAX_INPUT_HEIGHT_PX = 160; // about 6 lines, then the box scrolls
+const MAX_INPUT_CHARS = 2000;
 
 /* ------------------------------------------------------------------ */
 /*  Types (reused from ChatPanel)                                      */
@@ -78,7 +82,7 @@ export default function ChatPanel() {
   const [isLoading, setIsLoading] = useState(false);
 
   const scrollRef = useRef<HTMLDivElement>(null);
-  const inputRef = useRef<HTMLInputElement>(null);
+  const inputRef = useRef<HTMLTextAreaElement>(null);
   const historyRef = useRef<ChatHistoryItem[]>([]);
   const idRef = useRef(0);
 
@@ -101,6 +105,14 @@ export default function ChatPanel() {
   useEffect(() => {
     inputRef.current?.focus();
   }, []);
+
+  // Grow the question box with its text (up to ~6 lines); shrink back after sending.
+  useEffect(() => {
+    const el = inputRef.current;
+    if (!el) return;
+    el.style.height = "auto";
+    el.style.height = `${Math.min(el.scrollHeight, MAX_INPUT_HEIGHT_PX)}px`;
+  }, [input]);
 
   const addBotMessage = useCallback(
     (text: string) => {
@@ -146,11 +158,13 @@ export default function ChatPanel() {
     }
   }, [input, isLoading, nextId, scrollToBottom, addBotMessage]);
 
-  const handleKeyDown = (e: React.KeyboardEvent) => {
-    if (e.key === "Enter" && !e.shiftKey) {
-      e.preventDefault();
-      handleSend();
-    }
+  const handleKeyDown = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
+    if (e.key !== "Enter") return;
+    // Enter while composing Hindi (IME) confirms the word; it must not send.
+    if (e.nativeEvent.isComposing) return;
+    if (e.shiftKey) return; // Shift+Enter: the browser inserts a new line
+    e.preventDefault();
+    handleSend();
   };
 
   const isInitialView = messages.length === 0;
@@ -190,18 +204,25 @@ export default function ChatPanel() {
 
   /* ---------- Input bar ---------- */
   const inputBarContent = (
-    <div className="flex items-center gap-2">
-      <input
+    <div className="flex items-end gap-2">
+      <textarea
         ref={inputRef}
-        type="text"
+        rows={1}
+        maxLength={MAX_INPUT_CHARS}
         value={input}
         onChange={(e) => setInput(e.target.value)}
         onKeyDown={handleKeyDown}
         placeholder={
-          isInitialView ? "Ask about the Bhumi Vikas Rules…" : "Type your message…"
+          isInitialView
+            ? "Ask about the Bhumi Vikas Rules…  (Shift+Enter for a new line)"
+            : "Type your message…  (Shift+Enter for a new line)"
         }
+        aria-label="Your question"
         disabled={isLoading}
-        className={`flex-1 rounded-full border border-transparent px-4 py-2.5 text-sm outline-none transition-all focus:border-[#F2E9D0]/40 ${C.inputField}`}
+        className={`flex-1 resize-none overflow-y-auto rounded-2xl border border-transparent px-4 py-2.5 text-sm leading-6 outline-none transition-colors focus:border-[#F2E9D0]/40 ${C.inputField}`}
+      />
+      <MicButton
+        onTranscript={(t) => setInput((prev) => (prev ? `${prev} ${t}` : t))}
       />
       <button
         onClick={handleSend}

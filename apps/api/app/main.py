@@ -3,6 +3,8 @@ import os
 
 from fastapi import Depends, FastAPI, Header, HTTPException
 
+from app.stt import router as stt_router
+
 
 def require_bff(x_bff_secret: str = Header(default="")):
     """Only the Next.js BFF knows this secret; direct calls are rejected."""
@@ -17,6 +19,9 @@ app = FastAPI(
     openapi_url=None,
     dependencies=[Depends(require_bff)],
 )
+
+
+app.include_router(stt_router)
 
 
 @app.get("/health")
