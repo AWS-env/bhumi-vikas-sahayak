@@ -4,6 +4,7 @@ import React, { useState, useRef, useEffect, useCallback } from "react";
 import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
 import MicButton from "./MicButton";
+import SpeakButton from "./SpeakButton";
 
 const MAX_INPUT_HEIGHT_PX = 160; // about 6 lines, then the box scrolls
 const MAX_INPUT_CHARS = 2000;
@@ -38,6 +39,7 @@ const NOTE = {
     rule: "Rule",
     page: "p.",
     retry: "Try again",
+    listen: "Listen",
   },
   hi: {
     basis: "यह उत्तर म.प्र. भूमि विकास नियम, 2012 (6 मार्च 2025 तक समेकित) पर आधारित है। इसके बाद के संशोधन शामिल नहीं हैं। यह कानूनी सलाह नहीं है — निर्णय क्लर्क का है।",
@@ -47,6 +49,7 @@ const NOTE = {
     rule: "नियम",
     page: "पृ.",
     retry: "फिर कोशिश करें",
+    listen: "सुनें",
   },
 } as const;
 
@@ -415,6 +418,9 @@ function BotText({ msg }: { msg: DisplayMessage }) {
         </div>
       )}
       {sources.length > 0 && <p className="mt-2 text-[11px] leading-snug text-[#F2E9D0]/55">{t.basis}</p>}
+      <div className="mt-2">
+        <SpeakButton text={msg.text} label={t.listen} />
+      </div>
     </>
   );
 }
