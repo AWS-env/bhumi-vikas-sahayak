@@ -1,6 +1,8 @@
 "use client";
 
 import React, { useState, useRef, useEffect, useCallback } from "react";
+import ReactMarkdown from "react-markdown";
+import remarkGfm from "remark-gfm";
 import MicButton from "./MicButton";
 
 const MAX_INPUT_HEIGHT_PX = 160; // about 6 lines, then the box scrolls
@@ -10,11 +12,43 @@ const MAX_INPUT_CHARS = 2000;
 /*  Types (reused from ChatPanel)                                      */
 /* ------------------------------------------------------------------ */
 
+interface Source {
+  rule_id: string;
+  title: string;
+  page: number;
+}
+
 interface DisplayMessage {
   id: string;
   role: "user" | "bot";
   text: string;
+  sources?: Source[];
+  language?: "english" | "hindi" | "hinglish";
+  amendmentWarning?: boolean;
+  /** Set on a failed turn: the question that can be sent again. */
+  retryText?: string;
 }
+
+const NOTE = {
+  en: {
+    basis: "Based on the MP Bhumi Vikas Rules, 2012, consolidated to 6 March 2025. Amendments after that date are not included. Not legal advice — the clerk decides.",
+    amendment:
+      "The rules for plots up to 500 sq m were amended on 28 August 2026 (Rule 2(5)(c)). That amendment is NOT included here — please verify the current position.",
+    sources: "Sources",
+    rule: "Rule",
+    page: "p.",
+    retry: "Try again",
+  },
+  hi: {
+    basis: "यह उत्तर म.प्र. भूमि विकास नियम, 2012 (6 मार्च 2025 तक समेकित) पर आधारित है। इसके बाद के संशोधन शामिल नहीं हैं। यह कानूनी सलाह नहीं है — निर्णय क्लर्क का है।",
+    amendment:
+      "500 वर्ग मीटर तक के भूखंडों के नियम 28 अगस्त 2026 को संशोधित हुए (नियम 2(5)(c))। वह संशोधन यहाँ शामिल नहीं है — कृपया वर्तमान स्थिति जाँचें।",
+    sources: "स्रोत",
+    rule: "नियम",
+    page: "पृ.",
+    retry: "फिर कोशिश करें",
+  },
+} as const;
 
 interface ChatHistoryItem {
   role: "user" | "model";
@@ -24,6 +58,7 @@ interface ChatHistoryItem {
 /* Palette matched to the reference etching — deep blueprint blue + ivory */
 const C = {
   panel: "bg-[#053581] paper-grain",
+  errorBubble: "bg-[#5B1A1A] text-[#F9E3E3] border border-red-300/40",
   botBubble: "bg-[#14438A] text-[#F2E9D0] border border-[#F2E9D0]/20",
   userBubble: "bg-[#F2E9D0] text-[#0A3982]",
   inputShell: "border-[#F2E9D0]/25 bg-[#14438A]",
@@ -114,22 +149,16 @@ export default function ChatPanel() {
     el.style.height = `${Math.min(el.scrollHeight, MAX_INPUT_HEIGHT_PX)}px`;
   }, [input]);
 
-  const addBotMessage = useCallback(
-    (text: string) => {
-      setMessages((prev) => [...prev, { id: nextId(), role: "bot", text }]);
-      historyRef.current.push({ role: "model", text });
-      scrollToBottom();
-    },
-    [nextId, scrollToBottom]
-  );
-
-  const handleSend = useCallback(async () => {
-    const text = input.trim();
+  const send = useCallback(async (text: string) => {
     if (!text || isLoading) return;
 
-    setMessages((prev) => [...prev, { id: nextId(), role: "user", text }]);
+    // Retrying replaces the failed turn (its question and error bubble) instead of duplicating it.
+    setMessages((prev) => {
+      const last = prev[prev.length - 1];
+      const base = last?.retryText ? prev.slice(0, -2) : prev;
+      return [...base, { id: nextId(), role: "user", text }];
+    });
     historyRef.current.push({ role: "user", text });
-    setInput("");
     setIsLoading(true);
     scrollToBottom();
 
@@ -148,15 +177,36 @@ export default function ChatPanel() {
               : "Request failed")
         );
       }
-      addBotMessage(data?.reply ?? "No reply received. Please try again.");
+      if (!data?.reply) throw new Error("No reply received. Please try again.");
+      setMessages((prev) => [
+        ...prev,
+        {
+          id: nextId(),
+          role: "bot",
+          text: data.reply,
+          sources: data.sources,
+          language: data.language,
+          amendmentWarning: data.amendment_warning,
+        },
+      ]);
+      historyRef.current.push({ role: "model", text: data.reply });
     } catch (err) {
+      // Errors are shown but never stored in the history sent to the model.
+      historyRef.current.pop();
       const msg = err instanceof Error ? err.message : "Something went wrong.";
-      addBotMessage(`⚠️ ${msg}`);
+      setMessages((prev) => [...prev, { id: nextId(), role: "bot", text: msg, retryText: text }]);
     } finally {
       setIsLoading(false);
       inputRef.current?.focus();
     }
-  }, [input, isLoading, nextId, scrollToBottom, addBotMessage]);
+  }, [isLoading, nextId, scrollToBottom]);
+
+  const handleSend = useCallback(() => {
+    const text = input.trim();
+    if (!text) return;
+    setInput("");
+    send(text);
+  }, [input, send]);
 
   const handleKeyDown = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
     if (e.key !== "Enter") return;
@@ -178,13 +228,27 @@ export default function ChatPanel() {
           className={`flex ${msg.role === "user" ? "justify-end" : "justify-start"}`}
         >
           <div
-            className={`max-w-[80%] rounded-2xl px-4 py-2 text-sm leading-relaxed whitespace-pre-wrap ${
+            className={`max-w-[85%] rounded-2xl px-4 py-2 text-sm leading-relaxed ${
               msg.role === "user"
-                ? `rounded-br-sm ${C.userBubble}`
-                : `rounded-bl-sm ${C.botBubble}`
+                ? `whitespace-pre-wrap rounded-br-sm ${C.userBubble}`
+                : `rounded-bl-sm ${msg.retryText ? C.errorBubble : C.botBubble}`
             }`}
           >
-            {renderMarkdown(msg.text)}
+            {msg.role === "user" || msg.retryText ? (
+              <span className="whitespace-pre-wrap">{msg.text}</span>
+            ) : (
+              <BotText msg={msg} />
+            )}
+            {msg.retryText && (
+              <button
+                type="button"
+                onClick={() => send(msg.retryText!)}
+                disabled={isLoading}
+                className="mt-2 block rounded-full border border-[#F2E9D0]/40 px-3 py-1 text-xs font-medium hover:bg-[#F2E9D0]/10 disabled:opacity-40"
+              >
+                {NOTE.en.retry}
+              </button>
+            )}
           </div>
         </div>
       ))}
@@ -196,6 +260,7 @@ export default function ChatPanel() {
             <span className="inline-block h-2 w-2 animate-bounce rounded-full bg-[#F2E9D0]/70 [animation-delay:0ms]" />
             <span className="inline-block h-2 w-2 animate-bounce rounded-full bg-[#F2E9D0]/70 [animation-delay:150ms]" />
             <span className="inline-block h-2 w-2 animate-bounce rounded-full bg-[#F2E9D0]/70 [animation-delay:300ms]" />
+            <span className="ml-2 text-xs text-[#F2E9D0]/70">Searching the rules…</span>
           </div>
         </div>
       )}
@@ -222,6 +287,7 @@ export default function ChatPanel() {
         className={`flex-1 resize-none overflow-y-auto rounded-2xl border border-transparent px-4 py-2.5 text-sm leading-6 outline-none transition-colors focus:border-[#F2E9D0]/40 ${C.inputField}`}
       />
       <MicButton
+        disabled={isLoading}
         onTranscript={(t) => setInput((prev) => (prev ? `${prev} ${t}` : t))}
       />
       <button
@@ -296,15 +362,59 @@ export default function ChatPanel() {
 }
 
 /* ------------------------------------------------------------------ */
-/*  Very lightweight Markdown renderer (bold only)                     */
+/*  Bot answer: markdown (tables, bold, lists), sources and the notes   */
 /* ------------------------------------------------------------------ */
 
-function renderMarkdown(text: string) {
-  const parts = text.split(/(\*\*[^*]+\*\*)/g);
-  return parts.map((part, i) => {
-    if (part.startsWith("**") && part.endsWith("**")) {
-      return <strong key={i}>{part.slice(2, -2)}</strong>;
-    }
-    return <React.Fragment key={i}>{part}</React.Fragment>;
-  });
+const MD_COMPONENTS = {
+  p: (props: React.ComponentProps<"p">) => <p className="my-1.5 first:mt-0 last:mb-0" {...props} />,
+  ul: (props: React.ComponentProps<"ul">) => <ul className="my-1.5 list-disc space-y-1 pl-5" {...props} />,
+  ol: (props: React.ComponentProps<"ol">) => <ol className="my-1.5 list-decimal space-y-1 pl-5" {...props} />,
+  blockquote: (props: React.ComponentProps<"blockquote">) => (
+    <blockquote className="my-2 border-l-2 border-[#F2E9D0]/40 pl-3 italic text-[#F2E9D0]/90" {...props} />
+  ),
+  table: (props: React.ComponentProps<"table">) => (
+    <div className="my-2 overflow-x-auto rounded-lg border border-[#F2E9D0]/20">
+      <table className="w-full border-collapse text-left text-xs" {...props} />
+    </div>
+  ),
+  th: (props: React.ComponentProps<"th">) => (
+    <th className="border-b border-[#F2E9D0]/25 bg-[#F2E9D0]/10 px-2.5 py-1.5 font-semibold" {...props} />
+  ),
+  td: (props: React.ComponentProps<"td">) => (
+    <td className="border-b border-[#F2E9D0]/10 px-2.5 py-1.5" {...props} />
+  ),
+  a: (props: React.ComponentProps<"a">) => <a className="underline" target="_blank" rel="noreferrer" {...props} />,
+};
+
+function BotText({ msg }: { msg: DisplayMessage }) {
+  const t = msg.language === "hindi" ? NOTE.hi : NOTE.en;
+  const sources = msg.sources ?? [];
+  return (
+    <>
+      <ReactMarkdown remarkPlugins={[remarkGfm]} components={MD_COMPONENTS}>
+        {msg.text}
+      </ReactMarkdown>
+      {msg.amendmentWarning && (
+        <p className="mt-2 rounded-lg border border-amber-300/50 bg-amber-300/10 px-3 py-2 text-xs leading-snug text-amber-100">
+          ⚠ {t.amendment}
+        </p>
+      )}
+      {sources.length > 0 && (
+        <div className="mt-2 flex flex-wrap items-center gap-1.5 border-t border-[#F2E9D0]/15 pt-2 text-xs">
+          <span className="text-[#F2E9D0]/60">{t.sources}:</span>
+          {sources.map((s) => (
+            <span
+              key={s.rule_id}
+              title={s.title}
+              className="rounded-full border border-[#F2E9D0]/30 px-2 py-0.5 text-[#F2E9D0]/90"
+            >
+              {t.rule} {s.rule_id} · {t.page}
+              {s.page}
+            </span>
+          ))}
+        </div>
+      )}
+      {sources.length > 0 && <p className="mt-2 text-[11px] leading-snug text-[#F2E9D0]/55">{t.basis}</p>}
+    </>
+  );
 }
