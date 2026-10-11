@@ -52,3 +52,10 @@ next-env.d.ts
 #agents
 .agents
 !.env.example
+
+# watch app local secrets
+watch/Sarthi/Sarthi Watch App/Secrets.swift
+
+# xcode
+xcuserdata/
+*.xcuserstate

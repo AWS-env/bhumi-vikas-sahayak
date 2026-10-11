@@ -1,67 +1,389 @@
-# Bhumi Vikas Sahayak
+# Bhumi Vikas Sahayak (Sarthi)
 
 **Track 1: Bhumi Vikas Sahayak** · Claude Impact Lab × Cerebras Café Compute, Bhopal · 11 October 2026
 
 **Team:** TEAM NAME (fill in) · Members: MEMBER NAMES (fill in)
 
-**The one user:** a building-permission clerk at the Bhopal Municipal Corporation counter. A citizen asks a question about the MP Bhumi Vikas Rules, 2012, and the clerk needs the rule number and the exact rule text within a minute. The tool points to the rule; the clerk decides. It is not legal advice.
+A question-answering tool for the **MP Bhumi Vikas Rules, 2012**. A clerk asks in English, Hindi or Hinglish and gets a short answer in the same language, with the rule number, the exact rule text it came from, and the PDF page. When the rules are silent, the tool says so instead of guessing.
+
+> **The tool points to the rule; the clerk decides.** This is not legal advice. The data is consolidated to **6 March 2025**. Later amendments, including the 28 August 2026 change to Rule 2(5)(c) for plots up to 500 sq m, are **not** included.
+
+---
+
+## Contents
+
+- [Who it is for](#who-it-is-for)
+- [What works today](#what-works-today)
+- [How it works](#how-it-works)
+- [Measured quality](#measured-quality)
+- [Known limits](#known-limits)
+- [Getting started](#getting-started)
+- [Configuration](#configuration)
+- [Data pipeline](#data-pipeline)
+- [Evaluation scripts](#evaluation-scripts)
+- [Apple Watch app](#apple-watch-app)
+- [API reference](#api-reference)
+- [Security model](#security-model)
+- [Deployment](#deployment)
+- [Project layout](#project-layout)
+- [Data sources](#data-sources)
+
+---
+
+## Who it is for
+
+The user is a **building-permission clerk at the Bhopal Municipal Corporation counter**. A citizen asks something like *"My plot is 200 sq m on a 9 m road. How much gap do I leave at the front, and what fee do I pay?"* The clerk needs the right rule number and its exact wording within a minute.
+
+The 108-page rulebook is hard to use at a counter for three reasons:
+
+- Fee and setback numbers sit in tables spread across the book, and tables are easy to misread.
+- The rules keep changing, so the clerk has to know which version an answer comes from.
+- Questions come in English and Hindi, and text copied from the official Hindi PDF comes out garbled.
+
+The full brief is in [`reference/PROBLEM-STATEMENT.md`](reference/PROBLEM-STATEMENT.md).
 
 ## What works today
 
-- **Login** (`/login`): email + password sign-in and sign-up (Supabase), English/Hindi toggle. `/chat` and all backend calls are protected; the browser never talks to the FastAPI backend directly (Next.js server acts as the gateway).
-- **The rulebook is prepared for search** (`apps/api/data/`):
-  - `rules_clean.jsonl`: 106 rules cleaned into 111 records (running page headers removed, amendment footnotes kept as dated metadata, nested rules 12-A, 17-a, 25(A), 42-A, 93(a) split out).
-  - `tables.json`: 14 priority tables (rules 56, 21, 52, 42 Tables 4/5/5-A, 53) extracted from the English PDF and compared by hand against the rendered PDF pages. Not independently checked by a second person.
-  - `chunks.jsonl`: 431 chunks following the rule structure, each with its rule number, title, part, PDF page range and its own amendment dates. Case-law "COMMENTS" blocks are kept but marked as never to be used as an answer source.
-- **Voice input (optional, not tested by the author of this README):** a mic button on the chat screen sends the recorded audio through the gateway to Sarvam AI speech-to-text (`apps/api/app/stt.py`). Needs `SARVAM_API_KEY`. Audio leaves this system to that third-party service.
-- **Search** (`apps/api/app/retrieval.py`): hybrid search (meaning + keyword, merged by rank fusion) in Qdrant, then a small local reranker. Everything runs on free tools.
+| Feature | Where | Status |
+|---|---|---|
+| Landing page ("Sarthi") | `apps/web/app/page.tsx` | Works |
+| Email + password sign-in / sign-up (Supabase), English/Hindi toggle | `apps/web/app/login/` | Works |
+| Protected chat screen with multi-turn conversation | `apps/web/app/chat/`, `apps/web/components/ChatPanel.tsx` | Works |
+| Cited answers: query rewrite → hybrid search → rerank → LLM answer | `apps/api/app/chat.py` | Works |
+| "Not found" reply when nothing in the rulebook is relevant | `apps/api/app/chat.py` (`NOT_FOUND_BELOW`) | Works |
+| Questions about a named rule ("what does rule 23 say") fetch that rule directly | `apps/api/app/retrieval.py` | Works |
+| Voice input via Sarvam AI speech-to-text | `apps/web/components/MicButton.tsx`, `apps/api/app/stt.py` | Built, **not verified end to end** |
+| Apple Watch app: ask by voice, hear the answer, see the rule number and PDF page | `watch/Sarthi/` | Works against a local backend; not committed yet. See [Apple Watch app](#apple-watch-app) |
+| WhatsApp Cloud API webhook | `apps/web/app/webhooks/whatsapp/route.ts` | Signature check and reply work; it sends a **placeholder** reply and is not yet connected to `/chat` |
+| Neo4j graph of rules and cross-references | `apps/api/scripts/index_graph.py` | Built but **not used**; nothing depends on it |
 
-## Measured retrieval quality (sample questions)
+## How it works
 
-On the 15 in-scope sample questions (`reference/resources/sample_questions.md`), checking whether the right rule appears in the top 5 results:
+```
+Browser ──► Next.js 16 (apps/web)  ──── x-bff-secret ────►  FastAPI (apps/api)
+            · proxy.ts checks the                            · /chat  /stt  /health
+              Supabase session                                     │
+            · /api/chat, /api/stt,                                 ├─► Cerebras  (query rewrite + answer)
+              /api/py/* forward to                                 ├─► Qdrant Cloud (dense + BM25 hybrid)
+              FastAPI server-side                                  ├─► fastembed, local (embeddings + reranker)
+                                                                   └─► Sarvam AI (speech-to-text, optional)
+Apple Watch ─────────── x-bff-secret (direct, no Supabase) ──►  FastAPI
+```
+
+### Answering a question (`POST /chat`)
+
+1. **Rewrite.** Cerebras turns the latest message (English, Hindi or Hinglish), plus up to 6 earlier turns, into one standalone English search query. Earlier turns are used only to resolve words like "it" or "that". The query keeps all numbers, units and rule numbers.
+2. **Hybrid search.** The query is embedded locally with `BAAI/bge-small-en-v1.5` (dense) and `Qdrant/bm25` (sparse). Qdrant fetches the top 20 from each and merges them with Reciprocal Rank Fusion. Only chunks marked `answerable` are searched, so case-law "COMMENTS" blocks are never used as a source.
+3. **Named rules.** If the query mentions a rule ("rule 42-A"), that rule's chunks are fetched directly and added to the candidates.
+4. **Rerank.** A local cross-encoder (`Xenova/ms-marco-MiniLM-L-6-v2`) rescores the candidates and keeps the top 5.
+5. **Not-found gate.** If the best rerank score is below `NOT_FOUND_BELOW` (default `-4`), the API returns a fixed "the rules appear to be silent on this" reply and does not call the LLM.
+6. **Answer.** Cerebras writes a short answer (temperature 0) using **only** the 5 excerpts. It replies in the user's language, cites rules as **Rule N**, quotes the key wording exactly, and copies table numbers without estimating. The response includes `sources` (rule id, title, PDF page).
+
+If `CEREBRAS_MODEL` fails, the API retries once with `CEREBRAS_FALLBACK_MODEL`. Reasoning models' `<think>` blocks are stripped from the output.
+
+### Tech stack
+
+| Layer | Choice |
+|---|---|
+| Frontend | Next.js 16.4 (App Router, Cache Components), React 19.3, Tailwind CSS 4, GSAP |
+| Auth | Supabase (`@supabase/ssr`, httpOnly cookies) |
+| Backend | FastAPI 0.115 on Python 3.12, managed with [uv](https://docs.astral.sh/uv/) |
+| Vector search | Qdrant Cloud, with named vectors `dense` (384-dim) and `bm25` (sparse) in one collection |
+| Embeddings / rerank | [fastembed](https://github.com/qdrant/fastembed), running locally on CPU (about 70 MB of models) |
+| LLM | Cerebras Inference (OpenAI-compatible chat completions) |
+| Speech-to-text | Sarvam AI `saarika:v2.5`, with automatic language detection |
+| Monorepo | npm workspaces + Turborepo |
+
+## Measured quality
+
+These figures measure **search only** (is the right rule among the 5 excerpts given to the LLM?). They do **not** measure the quality of the written answers.
+
+### Sample questions (`eval_retrieval.py`)
+
+The 15 in-scope questions from [`reference/resources/sample_questions.md`](reference/resources/sample_questions.md):
 
 | Method | Right rule in top 5 | Verified table in top 5 |
 |---|---|---|
 | Hybrid search only | 13 / 15 | 4 / 6 |
-| Hybrid + MiniLM reranker (used) | **15 / 15** | **6 / 6** |
+| Hybrid + MiniLM reranker (**used**) | **15 / 15** | **6 / 6** |
 
-Honest limits of this number: the "right rule" for each question was decided by us reading the rules (the data pack gives no answers), the file is `apps/api/data/golden_retrieval.json`; the two Hindi questions were tested with a hand-written English version because Hindi translation is not built yet; this measures search, not written answers.
+### Stress set (`eval_stress.py`, saved in `apps/api/data/stress_results.json`)
 
-## What does not work yet
+| Set | Right rule in top 5 | Ranked first |
+|---|---|---|
+| 28 harder English questions | 28 / 28 | 26 / 28 |
+| 13 Hindi questions, searched as-is | 3 / 13 | 2 / 13 |
+| Same 13 Hindi questions, translated to English by an LLM first | 11 / 13 | 10 / 13 |
 
-- **`/chat` is a screen only.** It does not send questions or show answers yet. The search works in code and in the evaluation script, but no endpoint connects it to the chat screen.
-- No written answer from a language model, no Hindi question handling, and no "not found" decision yet. (Two out-of-scope questions score clearly low on the reranker, so a threshold is possible, but it is not built.)
-- Fee and setback maths in code is not built; the extracted tables hold the numbers.
-- The amendment of 28 August 2026 to Rule 2(5)(c), and anything after 6 March 2025, is **not** in the data.
-- A knowledge graph (Neo4j) was prepared (`apps/api/scripts/index_graph.py`) but skipped; nothing depends on it.
-- Fee slabs are printed in whole square metres; how to treat an area between two slabs (e.g. 75.5 sq m) is not stated in the rules and needs a clerk's decision.
+**Out-of-scope questions** (6, e.g. "Who is the Chief Minister?", "How do I pay property tax online?") had a top rerank score of -5.3 or lower. The lowest in-scope question scored -3.65. The `-4` threshold falls between the two, which is the basis for the not-found gate.
 
-## Run it (5 steps)
+The table shows that Hindi search only works after translation. That is why `/chat` always rewrites the question into English first. Note that the stress run translated with a different model from the one `/chat` uses for its rewrite, so the live Hindi path has not been measured directly.
 
-Needs Node 20+, Python 3.12 with [uv](https://docs.astral.sh/uv/), a Supabase project (email confirmation off), a Qdrant Cloud cluster and a Cerebras key.
+### Caveats
 
-1. `npm install`, then `cd apps/api && uv sync`
-2. Copy `apps/web/.env.example` → `apps/web/.env.local` and `apps/api/.env.example` → `apps/api/.env`, fill them in (same `BFF_SHARED_SECRET` in both).
-3. Index the rules once (downloads ~70 MB of small models): `cd apps/api && uv run python -X utf8 scripts/index_qdrant.py`
-4. Terminal 1: `npm run dev:api`   Terminal 2: `npm run dev:web`, then open http://localhost:3000
-5. Check search quality: `cd apps/api && uv run python -X utf8 scripts/eval_retrieval.py --rerankers`
+- The "right rule" for each question was decided by the team reading the rules. The data pack gives no answer key. See `apps/api/data/golden_retrieval.json` and `golden_stress.json`.
+- `golden_multilingual.json` (146 items covering the same intents in English, Hindi and Hinglish, plus edge cases) has been built, but no script in this repo scores it yet.
+- The 14 extracted tables were compared by hand against the rendered PDF pages, but no second person has checked them.
 
-No API keys or secrets are stored in this repository; use the git-ignored env files.
+## Known limits
 
-## Data used
+- **Version gap.** Nothing after 6 March 2025 is in the data, including the 28 August 2026 amendment to Rule 2(5)(c).
+- **No calculations.** Fee and setback arithmetic is not done in code. The answer quotes the table and the clerk does the maths.
+- **Slab boundaries.** Fee slabs are printed in whole square metres. The rules do not say how to treat an area between two slabs (e.g. 75.5 sq m), so that needs a clerk's decision.
+- **Chat history is not saved.** It lives only in the browser tab.
+- **WhatsApp** sends a placeholder reply (see the `TODO` in `route.ts`).
+- **Voice** sends audio to a third-party service (Sarvam AI).
 
-- `reference/`: the official Track 1 data pack (rules as JSONL, full text by page, English and Hindi PDFs, sample questions), consolidated to 6 March 2025. Source: https://mptownplan.gov.in/NewsPDF/bvn06032025E.pdf
-- Everything in `apps/api/data/` is derived from that pack by the scripts in `apps/api/scripts/`.
-- No other data was added. No personal data. No live government system was used.
+## Getting started
 
-## Layout
+### Prerequisites
+
+- Node.js 20+ and npm 11
+- Python 3.12 and [uv](https://docs.astral.sh/uv/)
+- A [Supabase](https://supabase.com) project, with **Authentication → Email → "Confirm email" turned off** (otherwise sign-up shows a "confirmation is on" error)
+- A [Qdrant Cloud](https://cloud.qdrant.io) cluster (the free tier is enough)
+- A [Cerebras](https://cloud.cerebras.ai) API key
+- *Optional:* a [Sarvam AI](https://www.sarvam.ai) key for voice, and a Meta WhatsApp Cloud API app
+
+### Setup
+
+```bash
+# 1. Install dependencies
+npm install
+cd apps/api && uv sync && cd ../..
+
+# 2. Create env files (git-ignored) and fill them in. See "Configuration" below.
+cp apps/web/.env.example apps/web/.env.local
+cp apps/api/.env.example apps/api/.env
+
+# 3. Check that Qdrant is reachable. The Neo4j line will fail if Neo4j is not set up; that is fine.
+cd apps/api && uv run python -X utf8 scripts/check_connections.py
+
+# 4. Index the rulebook into Qdrant once (downloads ~70 MB of models on first run; safe to re-run)
+uv run python -X utf8 scripts/index_qdrant.py
+cd ../..
+```
+
+### Run
+
+```bash
+npm run dev:api   # terminal 1 → FastAPI on http://127.0.0.1:8000
+npm run dev:web   # terminal 2 → Next.js on http://localhost:3000
+```
+
+Open http://localhost:3000, sign up, and go to `/chat`.
+
+To test on a phone on the same Wi-Fi, run `npm run dev:lan -w api` instead, which binds FastAPI to `0.0.0.0`.
+
+> `-X utf8` matters on Windows, where the scripts print Hindi text and read UTF-8 files.
+
+## Configuration
+
+### `apps/web/.env.local`
+
+| Variable | Required | Purpose |
+|---|---|---|
+| `NEXT_PUBLIC_SUPABASE_URL` | yes | Supabase project URL |
+| `NEXT_PUBLIC_SUPABASE_ANON_KEY` | yes | Supabase public (anon) key |
+| `BFF_SHARED_SECRET` | yes | Random string; must match the API's value |
+| `BACKEND_URL` | yes | FastAPI base URL, e.g. `http://127.0.0.1:8000` |
+| `WHATSAPP_VERIFY_TOKEN` | WhatsApp only | Token Meta sends when you save the callback URL |
+| `WHATSAPP_APP_SECRET` | WhatsApp only | Used to verify the `x-hub-signature-256` header |
+| `WHATSAPP_ACCESS_TOKEN` | WhatsApp only | Graph API token for sending replies |
+| `WHATSAPP_GRAPH_VERSION` | no | Defaults to `v23.0` |
+
+### `apps/api/.env`
+
+| Variable | Required | Purpose |
+|---|---|---|
+| `BFF_SHARED_SECRET` | yes | Requests without it get `401` |
+| `QDRANT_URL`, `QDRANT_API_KEY` | yes | Qdrant Cloud cluster |
+| `QDRANT_COLLECTION` | yes | Collection name; defaults to `bhumi_rules` in the example |
+| `CEREBRAS_API_KEY` | yes | Cerebras Inference key |
+| `CEREBRAS_MODEL` | yes | Primary chat model |
+| `CEREBRAS_FALLBACK_MODEL` | no | Used if the primary model fails |
+| `NOT_FOUND_BELOW` | no | Rerank score threshold for "not found"; default `-4` |
+| `SARVAM_API_KEY` | voice only | Sarvam speech-to-text |
+| `NEO4J_URI`, `NEO4J_USERNAME`, `NEO4J_PASSWORD`, `NEO4J_DATABASE` | no | Only for `index_graph.py` / `check_connections.py` |
+
+Generate a shared secret with `openssl rand -hex 32`. No API keys or secrets are committed to this repository.
+
+## Data pipeline
+
+All derived data lives in `apps/api/data/` and is built from `reference/` by the scripts in `apps/api/scripts/`. The scripts never modify `reference/`. The derived files are already committed, so you only need to re-run the pipeline if you change it.
 
 ```
-apps/web   Next.js 16 (login, chat screen, gateway to the API)
-apps/api   FastAPI + data preparation scripts + search (Python 3.12, uv)
-reference  the official data pack
+reference/data/bhumi_vikas_rules.jsonl ──► clean_rules.py ──► rules_clean.jsonl ─┐
+reference/resources/…_EN.pdf ──► extract_tables.py ──► tables_raw.json           │
+                                   build_tables.py ──► tables.json ──────────────┤
+                                                                                 ▼
+                                                 chunk_rules.py ──► chunks.jsonl
+                                                                                 │
+                                                 index_qdrant.py ──► Qdrant  ◄───┘
+                                                 index_graph.py  ──► Neo4j (optional, unused)
 ```
 
-## License
+| Step | Script | Output |
+|---|---|---|
+| Clean | `clean_rules.py` | `rules_clean.jsonl`: **106 rules → 111 records**. Removes running page headers, moves amendment footnotes into dated `amendments` metadata, and splits nested rules (12-A, 17-a, 25(A), 42-A, 93(a)) into their own records. Hidden page/footnote markers let later steps track pages. |
+| Extract tables | `extract_tables.py` | `tables_raw.json`: ruled tables pulled from the priority PDF pages with pdfplumber |
+| Curate tables | `build_tables.py` | `tables.json`: **14 priority tables** (rules 56, 21, 52, 42 Tables 4/5/5-A, 53), printed as in the PDF, with numeric `bands` for lookup tables |
+| Chunk | `chunk_rules.py` | `chunks.jsonl`: **431 chunks** split along the rule structure (sub-rules, clauses, definitions, tables). Each chunk keeps its rule number, title, part, PDF page range and amendment dates, and is capped at ~1800 characters so bge-small does not truncate it. Case-law chunks are marked `answerable: false`. |
+| Index | `index_qdrant.py` | Upserts dense + BM25 vectors. Point ids are derived from `chunk_id`, so re-running updates points in place. |
 
-MIT, see `LICENSE`.
+```bash
+cd apps/api
+uv run python -X utf8 scripts/clean_rules.py
+uv run python -X utf8 scripts/extract_tables.py
+uv run python -X utf8 scripts/build_tables.py
+uv run python -X utf8 scripts/chunk_rules.py
+uv run python -X utf8 scripts/index_qdrant.py
+```
+
+## Evaluation scripts
+
+Run all of these from `apps/api` with `uv run python -X utf8 scripts/<name>`.
+
+| Script | What it checks | LLM calls |
+|---|---|---|
+| `eval_retrieval.py [--rerankers]` | Sample questions: right rule / verified table in the top 5. `--rerankers` also compares MiniLM with `jina-reranker-v1-tiny-en`. | none |
+| `eval_stress.py` | Harder English and Hindi questions, Hindi both as-is and translated; out-of-scope scores; whether a threshold separates them. Writes `data/stress_results.json`. | ~15 small |
+| `eval_determinism.py` | Same input gives the same retrieval, the same model output at temperature 0, and the same normalised cache key. Takes about 2 minutes. | ~120 small |
+| `build_multilingual_set.py` | Regenerates `data/golden_multilingual.json` | none |
+| `check_connections.py` | Qdrant / Neo4j connectivity and counts (never prints secrets) | none |
+
+## Apple Watch app
+
+`watch/Sarthi/` is a SwiftUI watchOS app called "Bhopal Sahayak" that lets the user ask by voice without using a keyboard.
+
+<p align="center">
+  <img src="apps/web/public/Watch_face.png" alt="Bhopal Sahayak on Apple Watch: navy screen with a domed-pavilion mark, a cream mic button labelled &quot;Ask a rule&quot;, the transcribed question below it, and a Bhopal lakefront skyline along the bottom" width="260">
+</p>
+
+**Flow**
+
+1. Tap the mic. The built-in watchOS recorder records up to 30 s (`.m4a`, wide-band speech).
+2. The audio goes to `POST /stt`, which returns a transcript from Sarvam AI.
+3. The transcript goes to `POST /chat` as a single-turn question.
+4. The watch shows the rule number and title, the answer, and the source line *"MP Bhumi Vikas Rules 2012, PDF page N"*. It also reads the answer aloud with `AVSpeechSynthesizer`. The rule shown is the first one cited in the reply, and falls back to the first source if no rule is cited. If there are no sources, it shows "Not found".
+
+**Requirements:** Xcode with the watchOS SDK. The deployment target is watchOS 27.0.
+
+**Setup**
+
+1. Create `watch/Sarthi/Sarthi Watch App/Secrets.swift`. It is git-ignored, so never commit it:
+
+   ```swift
+   import Foundation
+
+   enum Secrets {
+       /// Must equal BFF_SHARED_SECRET in apps/api/.env
+       static let bffSharedSecret = "<same value as apps/api/.env>"
+       /// Your Mac's LAN IP, used only on a real watch
+       static let macLANAddress = "192.168.x.x"
+   }
+   ```
+
+2. Start the backend:
+   - **Simulator:** `npm run dev:api` is enough, because the simulator reaches `http://127.0.0.1:8000`.
+   - **Real watch:** run `npm run dev:lan -w api` so FastAPI listens on `0.0.0.0:8000`. Keep the watch (or its paired iPhone) on the same Wi-Fi as the Mac.
+3. Open `watch/Sarthi/Sarthi.xcodeproj` and run the **Sarthi Watch App** scheme.
+
+**Limits**
+
+- **Bypasses the login.** The watch calls FastAPI directly with the shared secret, so it skips the Supabase session check. Anyone who has the secret, or the app binary that contains it, can call the API. That is acceptable for a local demo, but not for distribution. Before shipping, it should go through an authenticated gateway.
+- **Plain HTTP** to a LAN address only. There is no deployed backend URL.
+- **One question at a time.** There is no follow-up context between questions.
+- **English voice.** Speech uses an English (India) voice (`en-IN`), so Hindi replies are read aloud with an English voice.
+- `Sarthi-Watch-App-Info.plist` stores `NSAppTransportSecurity` as an array, but Apple documents it as a dictionary. If plain-HTTP requests fail on a real device, check this first.
+
+## API reference
+
+The browser only calls the Next.js routes. Every FastAPI route requires the `x-bff-secret` header, and the interactive docs (`/docs`, `/redoc`, `/openapi.json`) are turned off.
+
+| Next.js route | Auth | Forwards to | Notes |
+|---|---|---|---|
+| `POST /api/chat` | Supabase session | `POST /chat` | JSON chat request |
+| `POST /api/stt` | Supabase session | `POST /stt` | Raw audio bytes (has its own route because the generic proxy would corrupt binary data) |
+| `* /api/py/<path>` | Supabase session | `* /<path>` | Generic text/JSON passthrough, e.g. `/api/py/health` |
+| `GET/POST /webhooks/whatsapp` | Meta verify token / HMAC signature | none (placeholder) | Sits outside `/api` so Meta can reach it without a session |
+
+### `POST /chat`
+
+```jsonc
+// request
+{ "messages": [
+    { "role": "user",  "text": "Mera ghar 10 meter chaudi road pe hai, aage kitni jagah chhodni padegi?" }
+] }
+// role is "user" or "model"; 1–40 messages, each ≤ 4000 chars; the last one must be from the user
+
+// response
+{ "reply": "…**Rule 56**…",
+  "sources": [ { "rule_id": "56", "title": "…", "page": 77 } ] }
+```
+
+Errors: `400` if the last message is not from the user, `401` without the secret, `502` if the LLM is unavailable, `503` if the LLM is not configured.
+
+### `POST /stt`
+
+Send raw audio in the body (`content-type` such as `audio/webm`, up to 5 MB / ~30 s). The response is `{ "transcript": "…", "language_code": "hi-IN" }`.
+
+### `GET /health`
+
+Returns `{ "status": "ok" }`.
+
+## Security model
+
+- **BFF gateway.** The browser never reaches FastAPI. (The Apple Watch app is the exception; see [its limits](#apple-watch-app).) Next.js checks the Supabase session with `getUser()`, which revalidates with Supabase on every call (`getSession()` is not trusted). It then calls FastAPI server-side with `BFF_SHARED_SECRET`, which FastAPI compares in constant time.
+- **Route protection.** `apps/web/proxy.ts` (the Next.js 16 replacement for middleware) redirects signed-out users from `/chat` to `/login` and returns `401` for `/api/*`.
+- **Cookies.** Session cookies are `httpOnly`, and `secure` in production.
+- **WhatsApp.** Webhook requests are rejected unless their HMAC-SHA256 signature matches `WHATSAPP_APP_SECRET`.
+- **No personal data** is stored by this app. Chat history is not saved on the server. Audio and questions are sent to Sarvam AI and Cerebras respectively.
+
+## Deployment
+
+`vercel.json` deploys `apps/web` as a Vercel service. The FastAPI backend is **not** deployed by this config. Host it separately (any container or VM host that can run `uvicorn app.main:app`), then set `BACKEND_URL` and `BFF_SHARED_SECRET` in the Vercel project. Turborepo passes `BACKEND_URL`, `BFF_SHARED_SECRET` and `WHATSAPP_*` through to the build.
+
+The backend downloads about 70 MB of fastembed models on first request and loads them into memory, so give it at least ~1 GB of RAM and expect a slow first response.
+
+```bash
+npm run build   # turbo run build
+npm run lint    # turbo run lint
+```
+
+## Project layout
+
+```
+.
+├── apps/
+│   ├── web/                      Next.js 16 frontend + BFF gateway
+│   │   ├── app/
+│   │   │   ├── page.tsx          landing page ("Sarthi")
+│   │   │   ├── login/            sign-in / sign-up (server actions)
+│   │   │   ├── chat/             protected chat screen
+│   │   │   ├── api/chat/         → FastAPI /chat
+│   │   │   ├── api/stt/          → FastAPI /stt (raw audio)
+│   │   │   ├── api/py/[...path]/ generic passthrough
+│   │   │   └── webhooks/whatsapp/
+│   │   ├── components/           ChatPanel, MicButton
+│   │   ├── lib/supabase/         server-side Supabase client
+│   │   └── proxy.ts              session check + route protection
+│   └── api/                      FastAPI backend (Python 3.12, uv)
+│       ├── app/
+│       │   ├── main.py           app + shared-secret dependency
+│       │   ├── chat.py           rewrite → retrieve → answer
+│       │   ├── retrieval.py      hybrid search + rerank
+│       │   └── stt.py            Sarvam speech-to-text
+│       ├── data/                 derived data + golden eval sets
+│       └── scripts/              data pipeline, indexing, evaluation
+├── reference/                    official Track 1 data pack (read-only)
+├── watch/Sarthi/                 Apple Watch app (SwiftUI, watchOS)
+├── turbo.json · vercel.json · package.json
+└── LICENSE
+```
+
+## Data sources
+
+- **`reference/`** is the official Track 1 data pack: rules as JSONL, full text by page, the English and Hindi PDFs, and sample questions, consolidated to 6 March 2025. Source: https://mptownplan.gov.in/NewsPDF/bvn06032025E.pdf. The English PDF is the source of truth. See [`reference/data/DATA_DICTIONARY.md`](reference/data/DATA_DICTIONARY.md).
+- Everything in `apps/api/data/` is derived from that pack by the scripts above.
+- No other data was added, no personal data is included, and no live government system was used.
