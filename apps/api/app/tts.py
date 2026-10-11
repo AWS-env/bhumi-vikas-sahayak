@@ -1,95 +1,63 @@
-import logging
+"""POST /tts: text -> Ogg/Opus mono speech from Sarvam (the format WhatsApp needs for voice notes)."""
+import base64
 import os
 import re
 
 import httpx
-from fastapi import APIRouter, HTTPException
-from pydantic import BaseModel
+from fastapi import APIRouter, HTTPException, Response
+from pydantic import BaseModel, Field
 
 router = APIRouter()
-log = logging.getLogger("uvicorn.error")
 
 SARVAM_TTS_URL = "https://api.sarvam.ai/text-to-speech"
-MAX_TEXT_CHARS = 6000  # whole answers are read; anything longer is cut here
-CHUNK_CHARS = 1400  # bulbul:v2 accepts up to 1500 characters per request
-MAX_CHUNKS = 5
+MAX_TTS_CHARS = 2500  # bulbul:v3 limit per request
+TTS_LANGUAGES = {"bn-IN", "en-IN", "gu-IN", "hi-IN", "kn-IN", "ml-IN", "mr-IN", "od-IN", "pa-IN", "ta-IN", "te-IN"}
 
 
-class TtsRequest(BaseModel):
-    text: str
+class TtsIn(BaseModel):
+    text: str = Field(min_length=1, max_length=8000)
+    language_code: str | None = None
 
 
-def _plain(text: str) -> str:
-    """Strip markdown so the voice doesn't read out pipes, asterisks and links."""
-    text = re.sub(r"\[([^\]]+)\]\([^)]+\)", r"\1", text)
-    text = re.sub(r"^\s*\|?[\s:|-]+\|[\s:|-]*$", "", text, flags=re.M)  # table separator rows
-    text = text.replace("|", ", ")
-    text = re.sub(r"[*_`#>]+", "", text)
-    text = re.sub(r"^\s*[-•]\s+", "", text, flags=re.M)
-    return re.sub(r"\s+", " ", text).strip()
-
-
-def _chunks(text: str) -> list[str]:
-    """Split on sentence ends (including the Hindi danda) so each piece fits one request."""
-    out: list[str] = []
-    cur = ""
-    for sentence in re.split(r"(?<=[.!?।])\s+", text):
-        while len(sentence) > CHUNK_CHARS:
-            cut = sentence.rfind(" ", 0, CHUNK_CHARS) or CHUNK_CHARS
-            sentence, rest = sentence[:cut], sentence[cut:].strip()
-            if cur:
-                out.append(cur)
-                cur = ""
-            out.append(sentence)
-            sentence = rest
-        if cur and len(cur) + len(sentence) + 1 > CHUNK_CHARS:
-            out.append(cur)
-            cur = sentence
-        else:
-            cur = f"{cur} {sentence}".strip()
-    if cur:
-        out.append(cur)
-    return out[:MAX_CHUNKS]
+def _speakable(text):
+    """Drop Markdown/WhatsApp formatting and cut to the TTS limit on a sentence boundary."""
+    text = re.sub(r"[*_~`#>]", "", text)
+    text = re.sub(r"\s+", " ", text).strip()
+    if len(text) <= MAX_TTS_CHARS:
+        return text
+    cut = text[:MAX_TTS_CHARS]
+    end = max(cut.rfind(p) for p in (". ", "। ", "? ", "! "))
+    return cut[: end + 1] if end > MAX_TTS_CHARS // 2 else cut
 
 
 @router.post("/tts")
-async def text_to_speech(req: TtsRequest):
-    """Answer text -> {"audios": [base64 wav, ...]} in order, voiced by Sarvam."""
+async def text_to_speech(body: TtsIn):
     key = os.environ.get("SARVAM_API_KEY", "")
     if not key:
-        raise HTTPException(status_code=503, detail="tts_not_configured")
+        raise HTTPException(status_code=503, detail="tts not configured")
 
-    text = _plain(req.text)[:MAX_TEXT_CHARS]
+    text = _speakable(body.text)
     if not text:
-        raise HTTPException(status_code=400, detail="tts_empty")
+        raise HTTPException(status_code=400, detail="empty text")
+    language = body.language_code if body.language_code in TTS_LANGUAGES else "hi-IN"
 
-    # Devanagari anywhere -> Hindi voice; otherwise Indian English.
-    lang = "hi-IN" if re.search(r"[ऀ-ॿ]", text) else "en-IN"
+    async with httpx.AsyncClient(timeout=45) as client:
+        resp = await client.post(
+            SARVAM_TTS_URL,
+            headers={"api-subscription-key": key},
+            json={
+                "text": text,
+                "language_code": language,
+                "model": "bulbul:v3",
+                # Opus needs one of 8/12/16/24/48 kHz; Sarvam returns it in an Ogg container.
+                "output_audio_codec": "opus",
+                "speech_sample_rate": 24000,
+            },
+        )
+    if resp.status_code != 200:
+        raise HTTPException(status_code=502, detail="tts upstream error")
 
-    audios: list[str] = []
-    try:
-        async with httpx.AsyncClient(timeout=30) as client:
-            for piece in _chunks(text):
-                resp = await client.post(
-                    SARVAM_TTS_URL,
-                    headers={"api-subscription-key": key},
-                    json={
-                        "text": piece,
-                        "target_language_code": lang,
-                        "model": "bulbul:v2",
-                        "speaker": "anushka",
-                    },
-                )
-                if resp.status_code != 200:
-                    log.error("sarvam tts error %s: %s", resp.status_code, resp.text[:500])
-                    if resp.status_code == 429:
-                        raise HTTPException(status_code=503, detail="tts_busy")
-                    raise HTTPException(status_code=502, detail="tts_failed")
-                audios.extend(resp.json().get("audios") or [])
-    except httpx.HTTPError as e:
-        log.error("sarvam tts unreachable: %r", e)
-        raise HTTPException(status_code=502, detail="tts_unreachable")
-
-    if not audios:
-        raise HTTPException(status_code=502, detail="tts_failed")
-    return {"audios": audios}
+    audio = b"".join(base64.b64decode(a) for a in resp.json().get("audios", []))
+    if not audio:
+        raise HTTPException(status_code=502, detail="tts returned no audio")
+    return Response(content=audio, media_type="audio/ogg")

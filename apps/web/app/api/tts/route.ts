@@ -16,7 +16,7 @@ export async function POST(request: NextRequest) {
 
   let upstream: Response;
   try {
-    upstream = await fetch(`${process.env.BACKEND_URL}/tts`, {
+    upstream = await fetch(`${process.env.BACKEND_URL}/speak`, {
       method: "POST",
       headers: {
         "content-type": "application/json",
